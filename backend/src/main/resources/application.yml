@@ -1,0 +1,5 @@
+spring:
+	application:
+		name: smart-campus-operations-hub
+
+# Add datasource, security, and storage settings in the next step.

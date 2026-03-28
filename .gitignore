@@ -1,0 +1,24 @@
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Backend build outputs
+backend/target/
+backend/.mvn/
+
+# Frontend build outputs and dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Environment files
+.env
+.env.*
+
+# Test outputs
+coverage/
+reports/

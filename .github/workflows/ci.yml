@@ -1,0 +1,20 @@
+name: CI
+
+on:
+	push:
+		branches: ["main", "develop"]
+	pull_request:
+		branches: ["main", "develop"]
+
+jobs:
+	scaffold-check:
+		runs-on: ubuntu-latest
+		steps:
+			- name: Checkout
+				uses: actions/checkout@v4
+			- name: Validate scaffold
+				run: |
+					test -d backend
+					test -d frontend
+					test -d docs
+					echo "Scaffold validation passed"
