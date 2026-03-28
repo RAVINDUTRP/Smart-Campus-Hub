@@ -26,3 +26,24 @@ Monorepo scaffold for IT3030 coursework.
 ## Next Step
 
 Generate the backend and frontend starter apps inside the existing structure and then wire auth, database, and CI checks.
+
+## Run Locally
+
+Prerequisites:
+
+- Java 17+
+- Maven 3.9+
+- Node.js 20+
+
+Backend:
+
+1. `cd backend`
+2. `mvn spring-boot:run`
+3. Health check: `http://localhost:8080/api/v1/health`
+
+Frontend:
+
+1. `cd frontend`
+2. `npm install`
+3. `npm run dev`
+4. Open `http://localhost:5173`
