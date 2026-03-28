@@ -1,25 +1,25 @@
 spring:
-	application:
-		name: smart-campus-operations-hub
-	profiles:
-		default: dev
-	jpa:
-		open-in-view: false
-		hibernate:
-			ddl-auto: validate
-	flyway:
-		enabled: true
-	servlet:
-		multipart:
-			max-file-size: 5MB
-			max-request-size: 15MB
+  application:
+    name: smart-campus-operations-hub
+  profiles:
+    default: dev
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 15MB
 
 server:
-	port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8080}
 
 app:
-	cors:
-		allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
-	security:
-		oauth2:
-			enabled: ${SECURITY_OAUTH2_ENABLED:false}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  security:
+    oauth2:
+      enabled: ${SECURITY_OAUTH2_ENABLED:false}
