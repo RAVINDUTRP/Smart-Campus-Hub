@@ -1,0 +1,1 @@
+{"id":4,"name":"Evidence Room 1774813978","type":"MEETING_ROOM","capacity":25,"location":"Evidence Block","status":"ACTIVE","availabilityDays":"MON-FRI","availabilityStart":"08:00:00","availabilityEnd":"17:00:00","createdAt":"2026-03-29T19:52:58.333145Z"}HTTP:201

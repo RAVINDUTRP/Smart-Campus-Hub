@@ -1,0 +1,1 @@
+{"service":"smart-campus-operations-hub","status":"UP"}HTTP:200

@@ -1,0 +1,6 @@
+8|student1@smartcampus.local|TICKET_COMMENT_ADDED|t|2026-03-29 19:52:58.637937
+6|student1@smartcampus.local|TICKET_STATUS_UPDATED|f|2026-03-29 19:52:58.613485
+4|student1@smartcampus.local|TICKET_ASSIGNED|f|2026-03-29 19:52:58.577793
+3|student1@smartcampus.local|TICKET_CREATED|f|2026-03-29 19:52:58.479418
+2|student1@smartcampus.local|BOOKING_APPROVED|f|2026-03-29 19:52:58.458613
+1|student1@smartcampus.local|BOOKING_CREATED|f|2026-03-29 19:52:58.433763
