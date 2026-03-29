@@ -23,6 +23,31 @@ Monorepo scaffold for IT3030 coursework.
 - Module D: Notifications
 - Module E: Authentication and Authorization
 
+## Solo Work Allocation Strategy (GitHub Visible)
+
+This repository uses four workstreams to match the assignment's member split, even when implemented by one developer.
+
+- WS1: Facilities and Assets Catalogue (Module A)
+- WS2: Booking Workflow and Conflict Rules (Module B)
+- WS3: Tickets, Attachments, Technician Updates (Module C)
+- WS4: Notifications, Roles, OAuth2 (Modules D and E)
+
+To keep contributions clearly visible:
+
+1. Create feature branches per workstream.
+	- `feat/ws1-...`
+	- `feat/ws2-...`
+	- `feat/ws3-...`
+	- `feat/ws4-...`
+2. Use commit prefixes with the same workstream code.
+	- `WS1: add resource create endpoint`
+	- `WS2: add booking overlap validation`
+3. Open PRs using the project PR template and complete the endpoint/UI ownership sections.
+4. Record merged work in documentation:
+	- `docs/requirements/work-allocation-plan.md`
+	- `docs/api/endpoint-ownership-matrix.md`
+	- `docs/evidence/contribution-log-template.md`
+
 ## Next Step
 
 Generate the backend and frontend starter apps inside the existing structure and then wire auth, database, and CI checks.
