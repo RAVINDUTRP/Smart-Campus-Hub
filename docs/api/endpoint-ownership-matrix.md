@@ -4,10 +4,10 @@ Use this file to demonstrate exactly who implemented each endpoint and UI integr
 
 | Workstream | Module | Endpoint | Method | Purpose | UI Component/Page | Status |
 |---|---|---|---|---|---|---|
-| WS1 | A | /api/v1/resources | POST | Create resource | CataloguePage resource form | Implemented (Backend) |
-| WS1 | A | /api/v1/resources | GET | List resources with filters | CataloguePage resource table | Implemented (Backend) |
-| WS1 | A | /api/v1/resources/{id} | PUT | Update resource | CataloguePage edit modal | Implemented (Backend) |
-| WS1 | A | /api/v1/resources/{id} | DELETE | Delete resource | CataloguePage delete action | Implemented (Backend) |
+| WS1 | A | /api/v1/resources | POST | Create resource | CataloguePage resource form | Implemented (Backend + Frontend) |
+| WS1 | A | /api/v1/resources | GET | List resources with filters | CataloguePage resource table | Implemented (Backend + Frontend) |
+| WS1 | A | /api/v1/resources/{id} | PUT | Update resource | CataloguePage edit modal | Implemented (Backend + Frontend) |
+| WS1 | A | /api/v1/resources/{id} | DELETE | Delete resource | CataloguePage delete action | Implemented (Backend + Frontend) |
 | WS2 | B | /api/v1/bookings | POST | Create booking request | BookingsPage request form | Planned |
 | WS2 | B | /api/v1/bookings/my | GET | View own bookings | BookingsPage user list | Planned |
 | WS2 | B | /api/v1/bookings/{id}/approve | PATCH | Approve booking | BookingsPage admin actions | Planned |

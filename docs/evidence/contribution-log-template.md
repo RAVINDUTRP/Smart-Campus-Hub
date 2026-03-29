@@ -30,10 +30,10 @@ Add entries below this line as the project progresses.
 - Commit Hash: Pending
 - Assignment Module: A
 - Endpoints Added or Updated: POST/GET/GET by id/PUT/DELETE /api/v1/resources
-- UI Components or Pages Added or Updated: Pending (frontend integration not started)
+- UI Components or Pages Added or Updated: frontend/src/pages/CataloguePage.jsx, frontend/src/features/catalogue/resourceApi.js, frontend/src/styles/global.css
 - Tests Added or Updated: ResourceServiceTest, ResourceControllerIntegrationTest
 - Evidence Links:
   - Screenshot path: Pending
   - Postman collection path: Pending
   - Test report path: backend/target/surefire-reports
-- Notes: WS1 backend CRUD, filtering, validation, and global exception handling completed.
+- Notes: WS1 backend CRUD, filtering, validation, global exception handling, and frontend Catalogue integration completed.
