@@ -9,9 +9,9 @@ Track requirement-to-implementation and requirement-to-test links so evaluators 
 | B-01 | Create booking request | WS2 | POST /api/v1/bookings | Unit + Integration | BookingServiceTest, BookingControllerIntegrationTest | Pass (Backend) |
 | B-02 | Prevent overlapping bookings | WS2 | Booking conflict validation service | Unit + Integration | BookingServiceTest, BookingControllerIntegrationTest | Pass (Backend) |
 | B-03 | Approve or reject bookings | WS2 | PATCH approve/reject endpoints | Integration + UI | BookingControllerIntegrationTest | Pass (Backend API) |
-| C-01 | Create and track tickets | WS3 | /api/v1/tickets, TicketsPage | Unit + Integration | Pending | Pending |
-| C-02 | Attachment limit max 3 images | WS3 | attachments endpoint validation | Unit + Integration | Pending | Pending |
-| C-03 | Comment ownership rules | WS3 | comment edit/delete authorization | Unit + Integration | Pending | Pending |
+| C-01 | Create and track tickets | WS3 | /api/v1/tickets, TicketsPage | Unit + Integration | TicketServiceTest, TicketControllerIntegrationTest | Pass (Backend + Frontend) |
+| C-02 | Attachment limit max 3 images | WS3 | attachments endpoint validation | Unit + Integration | TicketServiceTest, TicketControllerIntegrationTest | Pass (Backend + Frontend API) |
+| C-03 | Comment ownership rules | WS3 | comment edit/delete authorization | Unit + Integration | TicketServiceTest, TicketControllerIntegrationTest | Pass (Backend + Frontend) |
 | D-01 | Notify booking and ticket changes | WS4 | notifications endpoints and UI panel | Integration + UI | Pending | Pending |
 | E-01 | OAuth2 login and role control | WS4 | auth + protected routes | Integration + UI | Pending | Pending |
 

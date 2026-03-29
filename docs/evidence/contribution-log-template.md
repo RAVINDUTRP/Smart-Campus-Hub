@@ -52,3 +52,18 @@ Add entries below this line as the project progresses.
   - Postman collection path: postman/ws2-booking-workflow.postman_collection.json
   - Test report path: backend/target/surefire-reports
 - Notes: WS2 backend booking workflow, conflict validation, status transition rules, and frontend bookings integration completed.
+
+- Date: 2026-03-30
+- Workstream: WS3
+- Branch: feat/ws3-ticketing-workflow
+- PR Number: Pending
+- Commit Hash: Pending
+- Assignment Module: C
+- Endpoints Added or Updated: /api/v1/tickets core endpoints, comments, attachments, assignment, status, rejection
+- UI Components or Pages Added or Updated: frontend/src/pages/TicketsPage.jsx, frontend/src/features/tickets/ticketApi.js
+- Tests Added or Updated: TicketServiceTest, TicketControllerIntegrationTest
+- Evidence Links:
+  - Screenshot path: Pending
+  - Postman collection path: postman/ws3-ticketing-workflow.postman_collection.json
+  - Test report path: backend/target/surefire-reports
+- Notes: WS3 ticket lifecycle, safe attachment upload constraints, and comment ownership rules implemented with frontend integration.

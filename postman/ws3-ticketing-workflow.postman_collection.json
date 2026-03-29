@@ -1,0 +1,167 @@
+{
+  "info": {
+    "name": "WS3 Ticketing Workflow",
+    "description": "Postman collection for Module C tickets, comments, and attachments.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Ticket",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"category\": \"PROJECTOR\",\n  \"description\": \"Projector not powering on\",\n  \"priority\": \"HIGH\",\n  \"location\": \"Block A - Lab 3\",\n  \"requesterEmail\": \"student1@smartcampus.local\",\n  \"preferredContact\": \"student1@smartcampus.local\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/tickets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "tickets"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Assign Technician",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"technicianEmail\": \"tech1@smartcampus.local\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/tickets/{{ticketId}}/assign",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "tickets",
+            "{{ticketId}}",
+            "assign"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Ticket Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"RESOLVED\",\n  \"resolutionNotes\": \"Replaced power cable\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/tickets/{{ticketId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "tickets",
+            "{{ticketId}}",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add Comment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"authorEmail\": \"student1@smartcampus.local\",\n  \"content\": \"Please resolve before tomorrow lab\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/tickets/{{ticketId}}/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "tickets",
+            "{{ticketId}}",
+            "comments"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Upload Attachment (form-data)",
+      "request": {
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "uploadedBy",
+              "value": "tech1@smartcampus.local",
+              "type": "text"
+            },
+            {
+              "key": "file",
+              "type": "file",
+              "src": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/tickets/{{ticketId}}/attachments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "tickets",
+            "{{ticketId}}",
+            "attachments"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "ticketId",
+      "value": "1"
+    }
+  ]
+}

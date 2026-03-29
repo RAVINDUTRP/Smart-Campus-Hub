@@ -37,8 +37,42 @@ public class GlobalExceptionHandler {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
+        @ExceptionHandler(TicketNotFoundException.class)
+        public ResponseEntity<ApiErrorResponse> handleTicketNotFound(TicketNotFoundException ex, HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.NOT_FOUND.value(),
+                                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
+        @ExceptionHandler(TicketCommentNotFoundException.class)
+        public ResponseEntity<ApiErrorResponse> handleCommentNotFound(TicketCommentNotFoundException ex, HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.NOT_FOUND.value(),
+                                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
         @ExceptionHandler(BookingConflictException.class)
         public ResponseEntity<ApiErrorResponse> handleConflict(BookingConflictException ex, HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.CONFLICT.value(),
+                                HttpStatus.CONFLICT.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
+
+        @ExceptionHandler(TicketAttachmentLimitException.class)
+        public ResponseEntity<ApiErrorResponse> handleAttachmentLimit(TicketAttachmentLimitException ex,
+                        HttpServletRequest request) {
                 ApiErrorResponse error = ApiErrorResponse.of(
                                 HttpStatus.CONFLICT.value(),
                                 HttpStatus.CONFLICT.getReasonPhrase(),
@@ -78,6 +112,30 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.badRequest().body(error);
     }
+
+        @ExceptionHandler(InvalidAttachmentException.class)
+        public ResponseEntity<ApiErrorResponse> handleInvalidAttachment(InvalidAttachmentException ex,
+                        HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST.value(),
+                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.badRequest().body(error);
+        }
+
+        @ExceptionHandler(TicketCommentOwnershipException.class)
+        public ResponseEntity<ApiErrorResponse> handleCommentOwnership(TicketCommentOwnershipException ex,
+                        HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.FORBIDDEN.value(),
+                                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiErrorResponse> handleConstraintViolation(
