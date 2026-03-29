@@ -4,8 +4,8 @@ Track requirement-to-implementation and requirement-to-test links so evaluators 
 
 | Requirement ID | Requirement Summary | Workstream | Endpoint or UI | Test Type | Test Reference | Result |
 |---|---|---|---|---|---|---|
-| A-01 | Add and manage resources | WS1 | /api/v1/resources, CataloguePage | Unit + Integration | Pending | Pending |
-| A-02 | Search and filter resources | WS1 | GET /api/v1/resources with query params | Integration + UI | Pending | Pending |
+| A-01 | Add and manage resources | WS1 | /api/v1/resources, CataloguePage | Unit + Integration | ResourceServiceTest, ResourceControllerIntegrationTest | Pass (Backend) |
+| A-02 | Search and filter resources | WS1 | GET /api/v1/resources with query params | Integration + UI | ResourceControllerIntegrationTest | Pass (Backend API) |
 | B-01 | Create booking request | WS2 | POST /api/v1/bookings | Unit + Integration | Pending | Pending |
 | B-02 | Prevent overlapping bookings | WS2 | Booking conflict validation service | Unit + Integration | Pending | Pending |
 | B-03 | Approve or reject bookings | WS2 | PATCH approve/reject endpoints | Integration + UI | Pending | Pending |
