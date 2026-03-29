@@ -59,6 +59,18 @@ public class GlobalExceptionHandler {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
+        @ExceptionHandler(NotificationNotFoundException.class)
+        public ResponseEntity<ApiErrorResponse> handleNotificationNotFound(NotificationNotFoundException ex,
+                        HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.NOT_FOUND.value(),
+                                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
         @ExceptionHandler(BookingConflictException.class)
         public ResponseEntity<ApiErrorResponse> handleConflict(BookingConflictException ex, HttpServletRequest request) {
                 ApiErrorResponse error = ApiErrorResponse.of(

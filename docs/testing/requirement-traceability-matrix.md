@@ -12,8 +12,8 @@ Track requirement-to-implementation and requirement-to-test links so evaluators 
 | C-01 | Create and track tickets | WS3 | /api/v1/tickets, TicketsPage | Unit + Integration | TicketServiceTest, TicketControllerIntegrationTest | Pass (Backend + Frontend) |
 | C-02 | Attachment limit max 3 images | WS3 | attachments endpoint validation | Unit + Integration | TicketServiceTest, TicketControllerIntegrationTest | Pass (Backend + Frontend API) |
 | C-03 | Comment ownership rules | WS3 | comment edit/delete authorization | Unit + Integration | TicketServiceTest, TicketControllerIntegrationTest | Pass (Backend + Frontend) |
-| D-01 | Notify booking and ticket changes | WS4 | notifications endpoints and UI panel | Integration + UI | Pending | Pending |
-| E-01 | OAuth2 login and role control | WS4 | auth + protected routes | Integration + UI | Pending | Pending |
+| D-01 | Notify booking and ticket changes | WS4 | /api/v1/notifications, NotificationsPage | Unit + Integration + UI | NotificationServiceTest, NotificationControllerIntegrationTest | Pass (Backend + Frontend) |
+| E-01 | OAuth2 login and role control | WS4 | /api/v1/auth/me, AppLayout role-aware profile card | Integration + UI | NotificationControllerIntegrationTest (auth profile endpoint) | Pass (Backend + Frontend) |
 
 ## Usage
 

@@ -27,6 +27,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/v1/health", "/api/v1/public/**", "/h2-console/**").permitAll();
                     if (oauth2Enabled) {
+                        auth.requestMatchers(
+                                "/api/v1/bookings/*/approve",
+                                "/api/v1/bookings/*/reject"
+                        ).hasRole("ADMIN");
+                        auth.requestMatchers(
+                                "/api/v1/tickets/*/assign",
+                                "/api/v1/tickets/*/status",
+                                "/api/v1/tickets/*/reject"
+                        ).hasAnyRole("ADMIN", "TECHNICIAN");
                         auth.anyRequest().authenticated();
                     } else {
                         auth.anyRequest().permitAll();

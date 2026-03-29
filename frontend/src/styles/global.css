@@ -38,6 +38,27 @@ body {
 	gap: 10px;
 }
 
+.profile-card {
+	margin-bottom: 14px;
+	padding: 10px;
+	border-radius: 10px;
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.profile-name {
+	margin: 0;
+	font-weight: 700;
+	font-size: 0.92rem;
+}
+
+.profile-email,
+.profile-roles {
+	margin: 4px 0 0;
+	font-size: 0.78rem;
+	color: #d2ddf2;
+}
+
 .nav-link {
 	color: #d2ddf2;
 	text-decoration: none;
@@ -249,8 +270,93 @@ th {
 	background: #b42318;
 }
 
+.notifications-toolbar {
+	display: grid;
+	grid-template-columns: 1fr auto auto;
+	gap: 12px;
+	align-items: end;
+	margin-bottom: 8px;
+}
+
+.notifications-toolbar label {
+	display: grid;
+	gap: 4px;
+	font-size: 0.92rem;
+	color: #2f3e55;
+}
+
+.notifications-toolbar input[type="email"] {
+	height: 38px;
+	padding: 0 10px;
+	border-radius: 8px;
+	border: 1px solid #cbd6e5;
+	font-size: 0.95rem;
+	min-width: 280px;
+}
+
+.checkbox-row {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 38px;
+}
+
+.notification-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	gap: 10px;
+}
+
+.notification-item {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	align-items: flex-start;
+	padding: 12px;
+	border: 1px solid #d8e4f4;
+	border-radius: 10px;
+	background: #ffffff;
+}
+
+.notification-item.read {
+	opacity: 0.75;
+	background: #f8fbff;
+}
+
+.notification-title {
+	margin: 0;
+	font-weight: 700;
+}
+
+.notification-message {
+	margin: 5px 0;
+	color: #2f3e55;
+}
+
+.notification-meta {
+	margin: 0;
+	font-size: 0.8rem;
+	color: #5b6d86;
+}
+
+.muted {
+	color: #5b6d86;
+	font-size: 0.9rem;
+	margin-top: 0;
+}
+
 @media (max-width: 1100px) {
 	.catalogue-grid {
 		grid-template-columns: 1fr;
+	}
+
+	.notifications-toolbar {
+		grid-template-columns: 1fr;
+	}
+
+	.notifications-toolbar input[type="email"] {
+		min-width: 0;
 	}
 }

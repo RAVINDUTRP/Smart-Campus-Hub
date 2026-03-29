@@ -67,3 +67,18 @@ Add entries below this line as the project progresses.
   - Postman collection path: postman/ws3-ticketing-workflow.postman_collection.json
   - Test report path: backend/target/surefire-reports
 - Notes: WS3 ticket lifecycle, safe attachment upload constraints, and comment ownership rules implemented with frontend integration.
+
+- Date: 2026-03-30
+- Workstream: WS4
+- Branch: development
+- PR Number: Pending
+- Commit Hash: Pending
+- Assignment Module: D, E
+- Endpoints Added or Updated: GET /api/v1/notifications, GET /api/v1/notifications/summary, PATCH /api/v1/notifications/{id}/read, GET /api/v1/auth/me
+- UI Components or Pages Added or Updated: frontend/src/pages/NotificationsPage.jsx, frontend/src/features/notifications/notificationApi.js, frontend/src/app/AppLayout.jsx, frontend/src/features/auth/authApi.js
+- Tests Added or Updated: NotificationServiceTest, NotificationControllerIntegrationTest
+- Evidence Links:
+  - Screenshot path: Pending
+  - Postman collection path: postman/ws4-notifications-auth.postman_collection.json
+  - Test report path: backend/target/surefire-reports
+- Notes: WS4 notification workflows were integrated into booking/ticket services and role-aware profile data was exposed via /api/v1/auth/me for frontend navigation context.

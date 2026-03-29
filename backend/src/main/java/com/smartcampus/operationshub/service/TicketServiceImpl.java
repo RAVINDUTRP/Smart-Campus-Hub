@@ -9,6 +9,7 @@ import com.smartcampus.operationshub.dto.TicketCreateRequest;
 import com.smartcampus.operationshub.dto.TicketRejectRequest;
 import com.smartcampus.operationshub.dto.TicketResponse;
 import com.smartcampus.operationshub.dto.TicketStatusUpdateRequest;
+import com.smartcampus.operationshub.entity.NotificationType;
 import com.smartcampus.operationshub.entity.Resource;
 import com.smartcampus.operationshub.entity.Ticket;
 import com.smartcampus.operationshub.entity.TicketAttachment;
@@ -32,10 +33,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -62,6 +65,7 @@ public class TicketServiceImpl implements TicketService {
     private final TicketAttachmentRepository ticketAttachmentRepository;
     private final ResourceRepository resourceRepository;
     private final Path attachmentStoragePath;
+    private NotificationService notificationService;
 
     public TicketServiceImpl(
             TicketRepository ticketRepository,
@@ -82,6 +86,11 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    @Autowired(required = false)
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
     @Override
     public TicketResponse createTicket(TicketCreateRequest request) {
         Ticket ticket = new Ticket();
@@ -99,7 +108,15 @@ public class TicketServiceImpl implements TicketService {
             ticket.setResource(resource);
         }
 
-        return toTicketResponse(ticketRepository.save(ticket), true);
+        Ticket saved = ticketRepository.save(ticket);
+        createTicketNotifications(
+            recipientSet(saved.getRequesterEmail()),
+            NotificationType.TICKET_CREATED,
+            "Ticket created",
+            "Ticket #" + saved.getId() + " has been created and is open.",
+            saved.getId()
+        );
+        return toTicketResponse(saved, true);
     }
 
     @Override
@@ -149,7 +166,16 @@ public class TicketServiceImpl implements TicketService {
         if (ticket.getStatus() == TicketStatus.OPEN) {
             ticket.setStatus(TicketStatus.IN_PROGRESS);
         }
-        return toTicketResponse(ticketRepository.save(ticket), true);
+
+        Ticket saved = ticketRepository.save(ticket);
+        createTicketNotifications(
+            recipientSet(saved.getRequesterEmail(), saved.getAssignedTechnicianEmail()),
+            NotificationType.TICKET_ASSIGNED,
+            "Ticket assigned",
+            "Ticket #" + saved.getId() + " has been assigned to " + saved.getAssignedTechnicianEmail() + ".",
+            saved.getId()
+        );
+        return toTicketResponse(saved, true);
     }
 
     @Override
@@ -169,7 +195,15 @@ public class TicketServiceImpl implements TicketService {
             ticket.setRejectionReason(null);
         }
 
-        return toTicketResponse(ticketRepository.save(ticket), true);
+        Ticket saved = ticketRepository.save(ticket);
+        createTicketNotifications(
+            recipientSet(saved.getRequesterEmail(), saved.getAssignedTechnicianEmail()),
+            NotificationType.TICKET_STATUS_UPDATED,
+            "Ticket status updated",
+            "Ticket #" + saved.getId() + " is now " + saved.getStatus() + ".",
+            saved.getId()
+        );
+        return toTicketResponse(saved, true);
     }
 
     @Override
@@ -180,7 +214,16 @@ public class TicketServiceImpl implements TicketService {
         }
         ticket.setStatus(TicketStatus.REJECTED);
         ticket.setRejectionReason(request.getReason().trim());
-        return toTicketResponse(ticketRepository.save(ticket), true);
+
+        Ticket saved = ticketRepository.save(ticket);
+        createTicketNotifications(
+            recipientSet(saved.getRequesterEmail(), saved.getAssignedTechnicianEmail()),
+            NotificationType.TICKET_REJECTED,
+            "Ticket rejected",
+            "Ticket #" + saved.getId() + " was rejected: " + saved.getRejectionReason(),
+            saved.getId()
+        );
+        return toTicketResponse(saved, true);
     }
 
     @Override
@@ -200,7 +243,16 @@ public class TicketServiceImpl implements TicketService {
         comment.setTicket(ticket);
         comment.setAuthorEmail(request.getAuthorEmail().trim().toLowerCase(Locale.ROOT));
         comment.setContent(request.getContent().trim());
-        return toCommentResponse(ticketCommentRepository.save(comment));
+
+        TicketComment saved = ticketCommentRepository.save(comment);
+        createTicketNotifications(
+            recipientSet(ticket.getRequesterEmail(), ticket.getAssignedTechnicianEmail()),
+            NotificationType.TICKET_COMMENT_ADDED,
+            "New ticket comment",
+            "Ticket #" + ticket.getId() + " has a new comment from " + saved.getAuthorEmail() + ".",
+            ticket.getId()
+        );
+        return toCommentResponse(saved);
     }
 
     @Override
@@ -391,5 +443,43 @@ public class TicketServiceImpl implements TicketService {
         response.setUploadedBy(attachment.getUploadedBy());
         response.setCreatedAt(attachment.getCreatedAt());
         return response;
+    }
+
+    private void createTicketNotifications(
+            Set<String> recipients,
+            NotificationType type,
+            String title,
+            String message,
+            Long ticketId
+    ) {
+        if (notificationService == null || recipients == null || recipients.isEmpty()) {
+            return;
+        }
+
+        recipients.stream()
+                .filter(email -> email != null && !email.isBlank())
+                .map(email -> email.trim().toLowerCase(Locale.ROOT))
+                .distinct()
+                .forEach(recipient -> notificationService.createNotification(
+                        recipient,
+                        type,
+                        title,
+                        message,
+                        "TICKET",
+                        ticketId
+                ));
+    }
+
+    private Set<String> recipientSet(String... emails) {
+        Set<String> recipients = new LinkedHashSet<>();
+        if (emails == null) {
+            return recipients;
+        }
+        for (String email : emails) {
+            if (email != null && !email.isBlank()) {
+                recipients.add(email);
+            }
+        }
+        return recipients;
     }
 }

@@ -6,6 +6,7 @@ import com.smartcampus.operationshub.dto.BookingRejectRequest;
 import com.smartcampus.operationshub.dto.BookingResponse;
 import com.smartcampus.operationshub.entity.Booking;
 import com.smartcampus.operationshub.entity.BookingStatus;
+import com.smartcampus.operationshub.entity.NotificationType;
 import com.smartcampus.operationshub.entity.Resource;
 import com.smartcampus.operationshub.entity.ResourceStatus;
 import com.smartcampus.operationshub.exception.BookingConflictException;
@@ -18,6 +19,7 @@ import com.smartcampus.operationshub.validation.BookingFilter;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -31,10 +33,16 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final ResourceRepository resourceRepository;
+    private NotificationService notificationService;
 
     public BookingServiceImpl(BookingRepository bookingRepository, ResourceRepository resourceRepository) {
         this.bookingRepository = bookingRepository;
         this.resourceRepository = resourceRepository;
+    }
+
+    @Autowired(required = false)
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -60,7 +68,14 @@ public class BookingServiceImpl implements BookingService {
         booking.setExpectedAttendees(request.getExpectedAttendees());
         booking.setStatus(BookingStatus.PENDING);
 
-        return toResponse(bookingRepository.save(booking));
+        Booking saved = bookingRepository.save(booking);
+        createBookingNotification(
+            saved,
+            NotificationType.BOOKING_CREATED,
+            "Booking request submitted",
+            "Your booking request for " + saved.getResource().getName() + " is now pending review."
+        );
+        return toResponse(saved);
     }
 
     @Override
@@ -124,7 +139,15 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(BookingStatus.APPROVED);
         booking.setRejectionReason(null);
-        return toResponse(bookingRepository.save(booking));
+
+        Booking saved = bookingRepository.save(booking);
+        createBookingNotification(
+            saved,
+            NotificationType.BOOKING_APPROVED,
+            "Booking approved",
+            "Booking #" + saved.getId() + " has been approved."
+        );
+        return toResponse(saved);
     }
 
     @Override
@@ -135,7 +158,15 @@ public class BookingServiceImpl implements BookingService {
         }
         booking.setStatus(BookingStatus.REJECTED);
         booking.setRejectionReason(request.getReason().trim());
-        return toResponse(bookingRepository.save(booking));
+
+        Booking saved = bookingRepository.save(booking);
+        createBookingNotification(
+            saved,
+            NotificationType.BOOKING_REJECTED,
+            "Booking rejected",
+            "Booking #" + saved.getId() + " was rejected: " + saved.getRejectionReason()
+        );
+        return toResponse(saved);
     }
 
     @Override
@@ -148,7 +179,15 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Users can only cancel their own bookings");
         }
         booking.setStatus(BookingStatus.CANCELLED);
-        return toResponse(bookingRepository.save(booking));
+
+        Booking saved = bookingRepository.save(booking);
+        createBookingNotification(
+            saved,
+            NotificationType.BOOKING_CANCELLED,
+            "Booking cancelled",
+            "Booking #" + saved.getId() + " has been cancelled."
+        );
+        return toResponse(saved);
     }
 
     private Resource findResource(Long resourceId) {
@@ -199,6 +238,20 @@ public class BookingServiceImpl implements BookingService {
         if (hasConflict) {
             throw new BookingConflictException(message);
         }
+    }
+
+    private void createBookingNotification(Booking booking, NotificationType type, String title, String message) {
+        if (notificationService == null) {
+            return;
+        }
+        notificationService.createNotification(
+                booking.getRequesterEmail(),
+                type,
+                title,
+                message,
+                "BOOKING",
+                booking.getId()
+        );
     }
 
     private BookingResponse toResponse(Booking booking) {
