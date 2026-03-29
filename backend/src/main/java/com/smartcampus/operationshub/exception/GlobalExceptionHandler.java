@@ -26,6 +26,39 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+        @ExceptionHandler(BookingNotFoundException.class)
+        public ResponseEntity<ApiErrorResponse> handleBookingNotFound(BookingNotFoundException ex, HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.NOT_FOUND.value(),
+                                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
+        @ExceptionHandler(BookingConflictException.class)
+        public ResponseEntity<ApiErrorResponse> handleConflict(BookingConflictException ex, HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.CONFLICT.value(),
+                                HttpStatus.CONFLICT.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
+
+        @ExceptionHandler(BookingStateException.class)
+        public ResponseEntity<ApiErrorResponse> handleState(BookingStateException ex, HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST.value(),
+                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.badRequest().body(error);
+        }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(
             MethodArgumentNotValidException ex,

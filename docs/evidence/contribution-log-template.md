@@ -37,3 +37,18 @@ Add entries below this line as the project progresses.
   - Postman collection path: Pending
   - Test report path: backend/target/surefire-reports
 - Notes: WS1 backend CRUD, filtering, validation, global exception handling, and frontend Catalogue integration completed.
+
+- Date: 2026-03-29
+- Workstream: WS2
+- Branch: feat/ws2-booking-workflow
+- PR Number: Pending
+- Commit Hash: Pending
+- Assignment Module: B
+- Endpoints Added or Updated: POST/GET/GET my/PATCH approve/PATCH reject/PATCH cancel /api/v1/bookings
+- UI Components or Pages Added or Updated: frontend/src/pages/BookingsPage.jsx, frontend/src/features/bookings/bookingApi.js
+- Tests Added or Updated: BookingServiceTest, BookingControllerIntegrationTest
+- Evidence Links:
+  - Screenshot path: Pending
+  - Postman collection path: postman/ws2-booking-workflow.postman_collection.json
+  - Test report path: backend/target/surefire-reports
+- Notes: WS2 backend booking workflow, conflict validation, status transition rules, and frontend bookings integration completed.

@@ -8,11 +8,11 @@ Use this file to demonstrate exactly who implemented each endpoint and UI integr
 | WS1 | A | /api/v1/resources | GET | List resources with filters | CataloguePage resource table | Implemented (Backend + Frontend) |
 | WS1 | A | /api/v1/resources/{id} | PUT | Update resource | CataloguePage edit modal | Implemented (Backend + Frontend) |
 | WS1 | A | /api/v1/resources/{id} | DELETE | Delete resource | CataloguePage delete action | Implemented (Backend + Frontend) |
-| WS2 | B | /api/v1/bookings | POST | Create booking request | BookingsPage request form | Planned |
-| WS2 | B | /api/v1/bookings/my | GET | View own bookings | BookingsPage user list | Planned |
-| WS2 | B | /api/v1/bookings/{id}/approve | PATCH | Approve booking | BookingsPage admin actions | Planned |
-| WS2 | B | /api/v1/bookings/{id}/reject | PATCH | Reject booking | BookingsPage admin actions | Planned |
-| WS2 | B | /api/v1/bookings/{id}/cancel | PATCH | Cancel approved booking | BookingsPage booking details | Planned |
+| WS2 | B | /api/v1/bookings | POST | Create booking request | BookingsPage request form | Implemented (Backend + Frontend) |
+| WS2 | B | /api/v1/bookings/my | GET | View own bookings | BookingsPage user list | Implemented (Backend + Frontend) |
+| WS2 | B | /api/v1/bookings/{id}/approve | PATCH | Approve booking | BookingsPage admin actions | Implemented (Backend + Frontend) |
+| WS2 | B | /api/v1/bookings/{id}/reject | PATCH | Reject booking | BookingsPage admin actions | Implemented (Backend + Frontend) |
+| WS2 | B | /api/v1/bookings/{id}/cancel | PATCH | Cancel approved booking | BookingsPage booking details | Implemented (Backend + Frontend) |
 | WS3 | C | /api/v1/tickets | POST | Create incident ticket | TicketsPage report form | Planned |
 | WS3 | C | /api/v1/tickets/{id}/assign | PATCH | Assign technician | TicketsPage admin panel | Planned |
 | WS3 | C | /api/v1/tickets/{id}/status | PATCH | Update ticket status | TicketsPage status actions | Planned |

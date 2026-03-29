@@ -6,9 +6,9 @@ Track requirement-to-implementation and requirement-to-test links so evaluators 
 |---|---|---|---|---|---|---|
 | A-01 | Add and manage resources | WS1 | /api/v1/resources, CataloguePage | Unit + Integration | ResourceServiceTest, ResourceControllerIntegrationTest | Pass (Backend) |
 | A-02 | Search and filter resources | WS1 | GET /api/v1/resources with query params | Integration + UI | ResourceControllerIntegrationTest | Pass (Backend API) |
-| B-01 | Create booking request | WS2 | POST /api/v1/bookings | Unit + Integration | Pending | Pending |
-| B-02 | Prevent overlapping bookings | WS2 | Booking conflict validation service | Unit + Integration | Pending | Pending |
-| B-03 | Approve or reject bookings | WS2 | PATCH approve/reject endpoints | Integration + UI | Pending | Pending |
+| B-01 | Create booking request | WS2 | POST /api/v1/bookings | Unit + Integration | BookingServiceTest, BookingControllerIntegrationTest | Pass (Backend) |
+| B-02 | Prevent overlapping bookings | WS2 | Booking conflict validation service | Unit + Integration | BookingServiceTest, BookingControllerIntegrationTest | Pass (Backend) |
+| B-03 | Approve or reject bookings | WS2 | PATCH approve/reject endpoints | Integration + UI | BookingControllerIntegrationTest | Pass (Backend API) |
 | C-01 | Create and track tickets | WS3 | /api/v1/tickets, TicketsPage | Unit + Integration | Pending | Pending |
 | C-02 | Attachment limit max 3 images | WS3 | attachments endpoint validation | Unit + Integration | Pending | Pending |
 | C-03 | Comment ownership rules | WS3 | comment edit/delete authorization | Unit + Integration | Pending | Pending |
