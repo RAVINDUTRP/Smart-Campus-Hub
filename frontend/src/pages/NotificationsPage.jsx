@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchCurrentUser } from "../features/auth/authApi";
+import { useAuth } from "../context/AuthContext";
 import {
 	fetchNotifications,
 	fetchNotificationSummary,
@@ -19,7 +19,8 @@ function getErrorMessage(error) {
 }
 
 function NotificationsPage() {
-	const [recipientEmail, setRecipientEmail] = useState("student1@smartcampus.local");
+	const { profile } = useAuth();
+	const [recipientEmail, setRecipientEmail] = useState("");
 	const [notifications, setNotifications] = useState([]);
 	const [unreadOnly, setUnreadOnly] = useState(false);
 	const [unreadCount, setUnreadCount] = useState(0);
@@ -27,24 +28,10 @@ function NotificationsPage() {
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
-		let active = true;
-
-		async function hydrateFromProfile() {
-			try {
-				const profile = await fetchCurrentUser();
-				if (active && profile?.email) {
-					setRecipientEmail(profile.email);
-				}
-			} catch (_error) {
-				// Keep local default when profile API is not available.
-			}
+		if (profile?.email) {
+			setRecipientEmail(profile.email);
 		}
-
-		hydrateFromProfile();
-		return () => {
-			active = false;
-		};
-	}, []);
+	}, [profile]);
 
 	async function loadNotifications(options = {}) {
 		const email = options.email ?? recipientEmail;
@@ -92,11 +79,7 @@ function NotificationsPage() {
 				<div className="notifications-toolbar">
 					<label>
 						<span>Recipient Email</span>
-						<input
-							type="email"
-							value={recipientEmail}
-							onChange={(event) => setRecipientEmail(event.target.value)}
-						/>
+						<input type="email" value={recipientEmail} readOnly />
 					</label>
 					<label className="checkbox-row">
 						<input

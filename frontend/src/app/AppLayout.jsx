@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { fetchCurrentUser } from "../features/auth/authApi";
+import { useAuth } from "../context/AuthContext";
 
-const navItems = [
+const baseNavItems = [
 	{ label: "Dashboard", to: "/" },
 	{ label: "Catalogue", to: "/catalogue" },
 	{ label: "Bookings", to: "/bookings" },
@@ -11,29 +10,18 @@ const navItems = [
 ];
 
 function AppLayout() {
-	const [profile, setProfile] = useState(null);
+	const { profile, oauth2Enabled, logoutUrl, signOutLocal } = useAuth();
+	const navItems = baseNavItems;
 
-	useEffect(() => {
-		let active = true;
-
-		async function loadProfile() {
-			try {
-				const data = await fetchCurrentUser();
-				if (active) {
-					setProfile(data);
-				}
-			} catch (_error) {
-				if (active) {
-					setProfile(null);
-				}
-			}
+	function handleSignOut() {
+		if (oauth2Enabled) {
+			window.location.assign(logoutUrl);
+			return;
 		}
-
-		loadProfile();
-		return () => {
-			active = false;
-		};
-	}, []);
+		signOutLocal().finally(() => {
+			window.location.assign("/login");
+		});
+	}
 
 	return (
 		<div className="app-shell">
@@ -57,6 +45,11 @@ function AppLayout() {
 						</NavLink>
 					))}
 				</nav>
+				<div className="sidebar-auth-actions">
+					<button type="button" className="ghost-btn" onClick={handleSignOut}>
+						Sign out
+					</button>
+				</div>
 			</aside>
 			<main className="content">
 				<Outlet />

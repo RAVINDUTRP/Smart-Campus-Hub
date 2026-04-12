@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import {
 	approveBooking,
 	cancelBooking,
@@ -12,7 +13,7 @@ const bookingStatuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"];
 
 const initialBookingForm = {
 	resourceId: "",
-	requesterEmail: "student1@smartcampus.local",
+	requesterEmail: "",
 	startTime: "",
 	endTime: "",
 	purpose: "",
@@ -44,6 +45,8 @@ function toDateTimeLabel(value) {
 }
 
 function BookingsPage() {
+	const { profile, hasRole } = useAuth();
+	const isAdmin = hasRole("ADMIN");
 	const [bookingForm, setBookingForm] = useState(initialBookingForm);
 	const [adminFilters, setAdminFilters] = useState(initialAdminFilters);
 	const [myBookings, setMyBookings] = useState([]);
@@ -56,12 +59,19 @@ function BookingsPage() {
 	const canSubmit = useMemo(
 		() =>
 			bookingForm.resourceId &&
-			bookingForm.requesterEmail &&
+			(profile?.email || bookingForm.requesterEmail) &&
 			bookingForm.startTime &&
 			bookingForm.endTime &&
 			bookingForm.purpose,
-		[bookingForm]
+		[bookingForm, profile]
 	);
+
+	useEffect(() => {
+		if (!profile?.email) {
+			return;
+		}
+		setBookingForm((prev) => ({ ...prev, requesterEmail: profile.email }));
+	}, [profile]);
 
 	function onBookingFormChange(event) {
 		const { name, value } = event.target;
@@ -79,7 +89,7 @@ function BookingsPage() {
 
 		const payload = {
 			resourceId: Number(bookingForm.resourceId),
-			requesterEmail: bookingForm.requesterEmail,
+			requesterEmail: profile?.email || bookingForm.requesterEmail,
 			startTime: `${bookingForm.startTime}:00`,
 			endTime: `${bookingForm.endTime}:00`,
 			purpose: bookingForm.purpose,
@@ -90,8 +100,10 @@ function BookingsPage() {
 			setIsSubmitting(true);
 			await createBooking(payload);
 			setFeedback({ type: "success", text: "Booking request submitted as PENDING." });
-			await loadMyBookings(bookingForm.requesterEmail);
-			await loadAdminBookings(adminFilters);
+			await loadMyBookings(payload.requesterEmail);
+			if (isAdmin) {
+				await loadAdminBookings(adminFilters);
+			}
 		} catch (error) {
 			setFeedback({ type: "error", text: getErrorMessage(error) });
 		} finally {
@@ -99,7 +111,7 @@ function BookingsPage() {
 		}
 	}
 
-	async function loadMyBookings(requesterEmail = bookingForm.requesterEmail) {
+	async function loadMyBookings(requesterEmail = profile?.email || bookingForm.requesterEmail) {
 		if (!requesterEmail) {
 			setFeedback({ type: "error", text: "Requester email is required to load your bookings." });
 			return;
@@ -132,6 +144,9 @@ function BookingsPage() {
 	}
 
 	async function handleApprove(id) {
+		if (!isAdmin) {
+			return;
+		}
 		try {
 			await approveBooking(id);
 			setFeedback({ type: "success", text: `Booking ${id} approved.` });
@@ -143,6 +158,9 @@ function BookingsPage() {
 	}
 
 	async function handleReject(id) {
+		if (!isAdmin) {
+			return;
+		}
 		const reason = window.prompt("Rejection reason:");
 		if (!reason) {
 			return;
@@ -160,10 +178,12 @@ function BookingsPage() {
 
 	async function handleCancel(id) {
 		try {
-			await cancelBooking(id, bookingForm.requesterEmail);
+			await cancelBooking(id, profile?.email || bookingForm.requesterEmail);
 			setFeedback({ type: "success", text: `Booking ${id} cancelled.` });
 			await loadMyBookings();
-			await loadAdminBookings(adminFilters);
+			if (isAdmin) {
+				await loadAdminBookings(adminFilters);
+			}
 		} catch (error) {
 			setFeedback({ type: "error", text: getErrorMessage(error) });
 		}
@@ -201,10 +221,9 @@ function BookingsPage() {
 							<span>Requester Email</span>
 							<input
 								name="requesterEmail"
-								value={bookingForm.requesterEmail}
-								onChange={onBookingFormChange}
+								value={profile?.email || bookingForm.requesterEmail}
 								type="email"
-								required
+								readOnly
 							/>
 						</label>
 
@@ -258,9 +277,10 @@ function BookingsPage() {
 					</form>
 				</article>
 
-				<article className="panel-card">
-					<h3>Admin Review Filters</h3>
-					<form className="filter-grid" onSubmit={handleAdminFilterSubmit}>
+				{isAdmin && (
+					<article className="panel-card">
+						<h3>Admin Review Filters</h3>
+						<form className="filter-grid" onSubmit={handleAdminFilterSubmit}>
 						<label>
 							<span>Resource ID</span>
 							<input
@@ -291,14 +311,15 @@ function BookingsPage() {
 								type="email"
 							/>
 						</label>
-						<div className="form-actions">
-							<button type="submit">Load Bookings</button>
-							<button type="button" className="ghost-btn" onClick={() => loadAdminBookings({})}>
-								Load All
-							</button>
-						</div>
-					</form>
-				</article>
+							<div className="form-actions">
+								<button type="submit">Load Bookings</button>
+								<button type="button" className="ghost-btn" onClick={() => loadAdminBookings({})}>
+									Load All
+								</button>
+							</div>
+						</form>
+					</article>
+				)}
 			</div>
 
 			{feedback.text && (
@@ -354,7 +375,8 @@ function BookingsPage() {
 				)}
 			</article>
 
-			<article className="panel-card" style={{ marginTop: "16px" }}>
+			{isAdmin && (
+				<article className="panel-card" style={{ marginTop: "16px" }}>
 				<div className="table-header">
 					<h3>Admin Booking Queue</h3>
 					<span>{adminBookings.length} item(s)</span>
@@ -408,7 +430,8 @@ function BookingsPage() {
 						</table>
 					</div>
 				)}
-			</article>
+				</article>
+			)}
 		</section>
 	);
 }
