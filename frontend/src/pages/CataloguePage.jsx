@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import {
 	createResource,
 	deleteResource,
@@ -47,6 +48,8 @@ function getErrorMessage(error) {
 }
 
 function CataloguePage() {
+	const { hasRole } = useAuth();
+	const isAdmin = hasRole("ADMIN");
 	const [resources, setResources] = useState([]);
 	const [form, setForm] = useState(initialFormState);
 	const [filters, setFilters] = useState(initialFilterState);
@@ -90,6 +93,10 @@ function CataloguePage() {
 	}
 
 	async function handleSave(event) {
+		if (!isAdmin) {
+			setFeedback({ type: "error", text: "Only ADMIN users can modify resources." });
+			return;
+		}
 		event.preventDefault();
 		setFeedback({ type: "", text: "" });
 
@@ -123,6 +130,9 @@ function CataloguePage() {
 	}
 
 	function handleEdit(resource) {
+		if (!isAdmin) {
+			return;
+		}
 		setEditingId(resource.id);
 		setForm({
 			name: resource.name,
@@ -138,6 +148,9 @@ function CataloguePage() {
 	}
 
 	async function handleDelete(resource) {
+		if (!isAdmin) {
+			return;
+		}
 		const confirmed = window.confirm(`Delete resource \"${resource.name}\"?`);
 		if (!confirmed) {
 			return;
@@ -166,13 +179,18 @@ function CataloguePage() {
 		<section className="catalogue-page">
 			<header className="section-header">
 				<h2>Facilities and Assets Catalogue</h2>
-				<p>Manage campus resources with availability, location, and status filtering.</p>
+				<p>View campus resources with availability, location, and status filtering.</p>
 			</header>
 
+			{!isAdmin && (
+				<p className="muted">Read-only mode: only ADMIN can create, update, and delete resources.</p>
+			)}
+
 			<div className="catalogue-grid">
-				<article className="panel-card">
-					<h3>{formTitle}</h3>
-					<form className="form-grid" onSubmit={handleSave}>
+				{isAdmin && (
+					<article className="panel-card">
+						<h3>{formTitle}</h3>
+						<form className="form-grid" onSubmit={handleSave}>
 						<label>
 							<span>Name</span>
 							<input name="name" value={form.name} onChange={handleFormChange} required maxLength={120} />
@@ -248,18 +266,19 @@ function CataloguePage() {
 							</label>
 						</div>
 
-						<div className="form-actions">
-							<button type="submit" disabled={isSubmitting}>
-								{isSubmitting ? "Saving..." : editingId ? "Update Resource" : "Create Resource"}
-							</button>
-							{editingId && (
-								<button type="button" className="ghost-btn" onClick={resetForm}>
-									Cancel Edit
+							<div className="form-actions">
+								<button type="submit" disabled={isSubmitting}>
+									{isSubmitting ? "Saving..." : editingId ? "Update Resource" : "Create Resource"}
 								</button>
-							)}
-						</div>
-					</form>
-				</article>
+								{editingId && (
+									<button type="button" className="ghost-btn" onClick={resetForm}>
+										Cancel Edit
+									</button>
+								)}
+							</div>
+						</form>
+					</article>
+				)}
 
 				<article className="panel-card">
 					<h3>Search and Filters</h3>
@@ -375,16 +394,22 @@ function CataloguePage() {
 											</small>
 										</td>
 										<td className="actions-cell">
-											<button type="button" className="small-btn" onClick={() => handleEdit(resource)}>
-												Edit
-											</button>
-											<button
-												type="button"
-												className="small-btn danger"
-												onClick={() => handleDelete(resource)}
-											>
-												Delete
-											</button>
+											{isAdmin ? (
+												<>
+													<button type="button" className="small-btn" onClick={() => handleEdit(resource)}>
+														Edit
+													</button>
+													<button
+														type="button"
+														className="small-btn danger"
+														onClick={() => handleDelete(resource)}
+													>
+														Delete
+													</button>
+												</>
+											) : (
+												<span>-</span>
+											)}
 										</td>
 									</tr>
 								))}

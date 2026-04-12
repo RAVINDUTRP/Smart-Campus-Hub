@@ -1,6 +1,7 @@
 package com.smartcampus.operationshub.controller;
 
 import com.smartcampus.operationshub.dto.UserProfileResponse;
+import com.smartcampus.operationshub.security.OAuth2RoleService;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +24,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private static final String DEFAULT_EMAIL = "student1@smartcampus.local";
+    private static final String GUEST_EMAIL = "guest@smartcampus.local";
 
     private final boolean oauth2Enabled;
+    private final String oauth2RegistrationId;
+    private final String backendBaseUrl;
+    private final OAuth2RoleService oauth2RoleService;
 
-    public AuthController(@Value("${app.security.oauth2.enabled:false}") boolean oauth2Enabled) {
+    public AuthController(
+            @Value("${app.security.oauth2.enabled:false}") boolean oauth2Enabled,
+            @Value("${app.security.oauth2.registration-id:google}") String oauth2RegistrationId,
+            @Value("${app.security.oauth2.backend-base-url:http://localhost:8080}") String backendBaseUrl,
+            OAuth2RoleService oauth2RoleService
+    ) {
         this.oauth2Enabled = oauth2Enabled;
+        this.oauth2RegistrationId = oauth2RegistrationId;
+        this.backendBaseUrl = backendBaseUrl;
+        this.oauth2RoleService = oauth2RoleService;
     }
 
     @GetMapping("/me")
@@ -39,9 +53,14 @@ public class AuthController {
                 && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
 
-        String email = isAuthenticated
-                ? normalizeEmail(authentication.getName(), DEFAULT_EMAIL)
-                : normalizeEmail(headerEmail, DEFAULT_EMAIL);
+        String email;
+        if (isAuthenticated) {
+            email = resolveAuthenticatedEmail(authentication);
+        } else if (!oauth2Enabled) {
+            email = normalizeEmail(headerEmail, GUEST_EMAIL);
+        } else {
+            email = GUEST_EMAIL;
+        }
 
         Set<String> roleSet = new LinkedHashSet<>();
         if (isAuthenticated) {
@@ -56,7 +75,7 @@ public class AuthController {
                     roleSet.add(authorityName);
                 }
             }
-        } else if (headerRoles != null && !headerRoles.isBlank()) {
+        } else if (!oauth2Enabled && headerRoles != null && !headerRoles.isBlank()) {
             for (String token : headerRoles.split(",")) {
                 if (!token.isBlank()) {
                     roleSet.add(token.trim().toUpperCase(Locale.ROOT));
@@ -64,7 +83,7 @@ public class AuthController {
             }
         }
 
-        if (roleSet.isEmpty()) {
+        if (roleSet.isEmpty() && (isAuthenticated || !GUEST_EMAIL.equals(email))) {
             roleSet.add("USER");
         }
 
@@ -74,7 +93,36 @@ public class AuthController {
         profile.setRoles(new ArrayList<>(roleSet));
         profile.setAuthenticated(isAuthenticated);
         profile.setOauth2Enabled(oauth2Enabled);
+        profile.setLoginUrl(buildLoginUrl());
+        profile.setLogoutUrl(buildLogoutUrl());
         return ResponseEntity.ok(profile);
+    }
+
+    private String resolveAuthenticatedEmail(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof OAuth2User oauth2User) {
+            return normalizeEmail(oauth2RoleService.extractEmail(oauth2User), DEFAULT_EMAIL);
+        }
+        return normalizeEmail(authentication.getName(), DEFAULT_EMAIL);
+    }
+
+    private String buildLoginUrl() {
+        return sanitizeBaseUrl(backendBaseUrl) + "/oauth2/authorization/" + oauth2RegistrationId;
+    }
+
+    private String buildLogoutUrl() {
+        return sanitizeBaseUrl(backendBaseUrl) + "/logout";
+    }
+
+    private String sanitizeBaseUrl(String value) {
+        if (value == null || value.isBlank()) {
+            return "http://localhost:8080";
+        }
+        String trimmed = value.trim();
+        if (trimmed.endsWith("/")) {
+            return trimmed.substring(0, trimmed.length() - 1);
+        }
+        return trimmed;
     }
 
     private String normalizeEmail(String input, String fallback) {
