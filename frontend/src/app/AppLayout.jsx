@@ -14,11 +14,12 @@ function AppLayout() {
 	const navItems = baseNavItems;
 
 	async function handleSignOut() {
-		await signOutLocal();
 		if (oauth2Enabled) {
-			window.location.assign(logoutUrl);
+			await signOutLocal({ skipRefresh: true });
+			window.location.replace(logoutUrl);
 			return;
 		}
+		await signOutLocal();
 		window.location.assign("/login");
 	}
 
@@ -29,6 +30,9 @@ function AppLayout() {
 				{profile && (
 					<div className="profile-card">
 						<p className="profile-email">{profile.email}</p>
+						{Array.isArray(profile.roles) && profile.roles.length > 0 && (
+							<p className="profile-roles">{profile.roles.join(" • ")}</p>
+						)}
 					</div>
 				)}
 				<nav>

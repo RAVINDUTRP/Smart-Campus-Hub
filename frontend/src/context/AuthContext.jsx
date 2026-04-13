@@ -86,10 +86,15 @@ export function AuthProvider({ children }) {
 		[refreshProfile]
 	);
 
-	const signOutLocal = useCallback(async () => {
+	const signOutLocal = useCallback(async ({ skipRefresh = false } = {}) => {
 		clearLocalAuthProfile();
 		setLocalSession(null);
 		setProfile(null);
+		if (skipRefresh) {
+			setIsLoadingProfile(false);
+			setError("");
+			return null;
+		}
 		return refreshProfile();
 	}, [refreshProfile]);
 
