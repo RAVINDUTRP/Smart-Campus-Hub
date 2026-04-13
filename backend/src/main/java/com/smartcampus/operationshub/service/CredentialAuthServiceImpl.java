@@ -72,6 +72,13 @@ public class CredentialAuthServiceImpl implements CredentialAuthService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<String> findPrimaryRoleByEmail(String email) {
+        return appUserRepository.findByEmail(normalizeEmail(email))
+                .map(user -> user.getRole().name());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<AppUser> findByEmail(String email) {
         return appUserRepository.findByEmail(normalizeEmail(email));
     }

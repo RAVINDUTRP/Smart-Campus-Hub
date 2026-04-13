@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartcampus.operationshub.dto.AuthLoginRequest;
+import com.smartcampus.operationshub.dto.AuthRoleResponse;
 import com.smartcampus.operationshub.dto.AuthSessionResponse;
 import com.smartcampus.operationshub.dto.AuthSignupRequest;
 import com.smartcampus.operationshub.dto.UserProfileResponse;
@@ -72,6 +74,22 @@ public class AuthController {
             throw new IllegalArgumentException("Local login is disabled while OAuth2 mode is enabled.");
         }
         return ResponseEntity.ok(credentialAuthService.login(request));
+    }
+
+    @GetMapping("/role")
+    public ResponseEntity<AuthRoleResponse> resolveRole(@RequestParam("email") String email) {
+        if (oauth2Enabled) {
+            throw new IllegalArgumentException("Local role lookup is disabled while OAuth2 mode is enabled.");
+        }
+        String normalizedEmail = normalizeEmail(email, "");
+        if (normalizedEmail.isBlank()) {
+            throw new IllegalArgumentException("Email is required.");
+        }
+
+        String role = credentialAuthService.findPrimaryRoleByEmail(normalizedEmail)
+                .orElseThrow(() -> new IllegalArgumentException("No registered user found for this email."));
+
+        return ResponseEntity.ok(new AuthRoleResponse(role));
     }
 
     @GetMapping("/me")

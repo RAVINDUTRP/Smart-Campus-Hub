@@ -15,6 +15,8 @@ public interface CredentialAuthService {
 
     AuthSessionResponse login(AuthLoginRequest request);
 
+    Optional<String> findPrimaryRoleByEmail(String email);
+
     Optional<AppUser> findByEmail(String email);
 
     Set<String> resolveRoleHierarchy(AppUserRole role);

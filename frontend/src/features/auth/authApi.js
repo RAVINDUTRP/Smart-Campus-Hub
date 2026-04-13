@@ -108,3 +108,14 @@ export async function signupLocal({ email, password, role }) {
 		throw new Error(resolveApiErrorMessage(error, "Unable to create account."));
 	}
 }
+
+export async function fetchLocalRoleByEmail(email) {
+	try {
+		const response = await httpClient.get("/auth/role", {
+			params: { email }
+		});
+		return response.data;
+	} catch (error) {
+		throw new Error(resolveApiErrorMessage(error, "Unable to detect role."));
+	}
+}

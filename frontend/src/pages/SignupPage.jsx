@@ -107,6 +107,16 @@ function SignupPage() {
 					<p className="mt-3 text-sm leading-relaxed text-blue-100/90">
 						Register once and access bookings, ticketing, notifications, and campus resources.
 					</p>
+
+					<div className="mt-8 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
+						<p className="m-0 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-blue-100/80">Account Setup</p>
+						<p className="m-0 mt-1 text-sm text-white">Register with your campus role to continue.</p>
+						<div className="mt-3 flex flex-wrap gap-2">
+							<span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wide text-blue-100">Secure access</span>
+							<span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wide text-blue-100">Role based</span>
+							<span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wide text-blue-100">Operations hub</span>
+						</div>
+					</div>
 				</div>
 
 				<div className="flex items-center p-7 sm:p-8">
@@ -136,16 +146,18 @@ function SignupPage() {
 										value={password}
 										onChange={(event) => setPassword(event.target.value)}
 										required
-										className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-12 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
+										className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-10 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
 									/>
 									<button
 										type="button"
 										onClick={() => setShowPassword((prev) => !prev)}
 										onMouseDown={(event) => event.preventDefault()}
-										className="absolute right-1 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg border border-slate-300 bg-slate-100 text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-400 hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 group-focus-within:border-blue-400"
+										className="absolute right-2.5 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center appearance-none border-0 bg-transparent p-0 text-slate-500 transition-colors duration-200 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
 										aria-label={showPassword ? "Hide password" : "Show password"}
+										title={showPassword ? "Hide password" : "Show password"}
+										aria-pressed={showPassword}
 									>
-										{showPassword ? <FaEye className="h-5 w-5" /> : <FaEyeSlash className="h-5 w-5" />}
+										{showPassword ? <FaEye className="h-4 w-4 text-slate-700" /> : <FaEyeSlash className="h-4 w-4 text-slate-700" />}
 									</button>
 								</div>
 							</label>
@@ -159,16 +171,18 @@ function SignupPage() {
 										value={confirmPassword}
 										onChange={(event) => setConfirmPassword(event.target.value)}
 										required
-										className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-12 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
+										className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-10 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
 									/>
 									<button
 										type="button"
 										onClick={() => setShowConfirmPassword((prev) => !prev)}
 										onMouseDown={(event) => event.preventDefault()}
-										className="absolute right-1 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg border border-slate-300 bg-slate-100 text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-400 hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 group-focus-within:border-blue-400"
+										className="absolute right-2.5 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center appearance-none border-0 bg-transparent p-0 text-slate-500 transition-colors duration-200 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
 										aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+										title={showConfirmPassword ? "Hide password" : "Show password"}
+										aria-pressed={showConfirmPassword}
 									>
-										{showConfirmPassword ? <FaEye className="h-5 w-5" /> : <FaEyeSlash className="h-5 w-5" />}
+										{showConfirmPassword ? <FaEye className="h-4 w-4 text-slate-700" /> : <FaEyeSlash className="h-4 w-4 text-slate-700" />}
 									</button>
 								</div>
 							</label>
