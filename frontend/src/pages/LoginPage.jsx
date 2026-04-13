@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { FaApple, FaFacebookF } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -22,12 +24,27 @@ function LoginPage() {
 		return <Navigate to="/" replace />;
 	}
 
-	function handleGoogleSignIn() {
-		if (!loginUrl) {
+	function getOAuthProviderUrl(provider) {
+		const marker = "/oauth2/authorization/";
+		if (loginUrl && loginUrl.includes(marker)) {
+			return `${loginUrl.split(marker)[0]}${marker}${provider}`;
+		}
+
+		const authBaseUrl = (import.meta.env.VITE_AUTH_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
+		return `${authBaseUrl}${marker}${provider}`;
+	}
+
+	function handleOAuthSignIn(provider) {
+		if (!oauth2Enabled) {
+			setFeedback("Social login is not enabled yet. Complete backend OAuth setup first.");
+			return;
+		}
+		const targetUrl = getOAuthProviderUrl(provider);
+		if (!targetUrl) {
 			setFeedback("Login URL is not configured.");
 			return;
 		}
-		window.location.assign(loginUrl);
+		window.location.assign(targetUrl);
 	}
 
 	async function handleLocalSignIn(event) {
@@ -93,20 +110,39 @@ function LoginPage() {
 
 					{oauth2Enabled ? (
 						<div className="mt-7 space-y-4">
-							<button
-								type="button"
-								onClick={handleGoogleSignIn}
-								className="group inline-flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-							>
-								<svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-									<path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.2-.9 2.2-1.9 2.9l3.1 2.4c1.8-1.7 2.8-4.1 2.8-6.9 0-.7-.1-1.5-.2-2.2H12z" />
-									<path fill="#34A853" d="M12 22c2.6 0 4.8-.9 6.4-2.5l-3.1-2.4c-.9.6-2 .9-3.3.9-2.5 0-4.6-1.7-5.3-4H3.5v2.5A10 10 0 0 0 12 22z" />
-									<path fill="#4A90E2" d="M6.7 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.5H3.5A10 10 0 0 0 2.4 12c0 1.6.4 3.1 1.1 4.5L6.7 14z" />
-									<path fill="#FBBC05" d="M12 6c1.4 0 2.7.5 3.7 1.4l2.8-2.8A10 10 0 0 0 3.5 7.5L6.7 10c.7-2.3 2.8-4 5.3-4z" />
-								</svg>
-								Login with Google
-							</button>
-							<p className="text-xs text-slate-400">You will be redirected to your OAuth provider.</p>
+							<p className="text-sm font-semibold text-slate-600">Continue with social account</p>
+							<div className="grid grid-cols-3 gap-3">
+								<button
+									type="button"
+									onClick={() => handleOAuthSignIn("google")}
+									className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+									aria-label="Login with Google"
+									title="Login with Google"
+								>
+									<FcGoogle className="h-5 w-5" />
+									Google
+								</button>
+								<button
+									type="button"
+									onClick={() => handleOAuthSignIn("facebook")}
+									className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-[#1877F2] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+									aria-label="Login with Facebook"
+									title="Login with Facebook"
+								>
+									<FaFacebookF className="h-5 w-5" />
+									Facebook
+								</button>
+								<button
+									type="button"
+									onClick={() => handleOAuthSignIn("apple")}
+									className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+									aria-label="Login with Apple"
+									title="Login with Apple"
+								>
+									<FaApple className="h-5 w-5" />
+									Apple
+								</button>
+							</div>
 						</div>
 					) : (
 						<div className="mt-7 space-y-5">
@@ -157,6 +193,42 @@ function LoginPage() {
 								>
 									Login
 								</button>
+
+								<div className="pt-1">
+									<p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Or login with</p>
+									<div className="grid grid-cols-3 gap-3">
+										<button
+											type="button"
+											onClick={() => handleOAuthSignIn("google")}
+											className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+											aria-label="Login with Google"
+											title="Login with Google"
+										>
+											<FcGoogle className="h-5 w-5" />
+											Google
+										</button>
+										<button
+											type="button"
+											onClick={() => handleOAuthSignIn("facebook")}
+											className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-[#1877F2] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+											aria-label="Login with Facebook"
+											title="Login with Facebook"
+										>
+											<FaFacebookF className="h-5 w-5" />
+											Facebook
+										</button>
+										<button
+											type="button"
+											onClick={() => handleOAuthSignIn("apple")}
+											className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+											aria-label="Login with Apple"
+											title="Login with Apple"
+										>
+											<FaApple className="h-5 w-5" />
+											Apple
+										</button>
+									</div>
+								</div>
 							</form>
 						</div>
 					)}
