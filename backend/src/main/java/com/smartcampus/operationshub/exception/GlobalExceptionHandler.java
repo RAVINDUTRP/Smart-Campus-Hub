@@ -181,6 +181,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+        @ExceptionHandler(UserAlreadyExistsException.class)
+        public ResponseEntity<ApiErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex,
+                        HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.CONFLICT.value(),
+                                HttpStatus.CONFLICT.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
+
+        @ExceptionHandler(InvalidCredentialsException.class)
+        public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex,
+                        HttpServletRequest request) {
+                ApiErrorResponse error = ApiErrorResponse.of(
+                                HttpStatus.UNAUTHORIZED.value(),
+                                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                                ex.getMessage(),
+                                request.getRequestURI()
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
         ApiErrorResponse error = ApiErrorResponse.of(

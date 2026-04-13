@@ -73,3 +73,38 @@ export async function fetchCurrentUser(headers = {}) {
 	});
 	return response.data;
 }
+
+function resolveApiErrorMessage(error, fallbackMessage) {
+	return (
+		error?.response?.data?.message ||
+		error?.response?.data?.error ||
+		error?.message ||
+		fallbackMessage
+	);
+}
+
+export async function loginLocal({ email, password, role }) {
+	try {
+		const response = await httpClient.post("/auth/login", {
+			email,
+			password,
+			role
+		});
+		return response.data;
+	} catch (error) {
+		throw new Error(resolveApiErrorMessage(error, "Unable to sign in."));
+	}
+}
+
+export async function signupLocal({ email, password, role }) {
+	try {
+		const response = await httpClient.post("/auth/signup", {
+			email,
+			password,
+			role
+		});
+		return response.data;
+	} catch (error) {
+		throw new Error(resolveApiErrorMessage(error, "Unable to create account."));
+	}
+}

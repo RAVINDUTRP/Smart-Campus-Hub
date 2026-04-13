@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaApple, FaChevronDown, FaEye, FaEyeSlash, FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const demoAccounts = [
@@ -17,7 +17,7 @@ const roleOptions = [
 ];
 
 function LoginPage() {
-	const { isLoadingProfile, oauth2Enabled, isAuthenticated, loginUrl, signInLocal, profile } = useAuth();
+	const { isLoadingProfile, oauth2Enabled, isAuthenticated, loginUrl, signInLocal, signInDemo, profile } = useAuth();
 	const [email, setEmail] = useState(profile?.email && profile.email !== "guest@smartcampus.local" ? profile.email : "");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
@@ -96,18 +96,22 @@ function LoginPage() {
 			return;
 		}
 
-		const roles = role === "ADMIN" ? ["USER", "ADMIN"] : role === "TECHNICIAN" ? ["USER", "TECHNICIAN"] : ["USER"];
-		await signInLocal({ email: normalizedEmail, password, roles });
+		try {
+			await signInLocal({ email: normalizedEmail, password, role });
+		} catch (error) {
+			setFeedback(error?.message || "Unable to sign in with this account.");
+		}
 	}
 
 	async function handleQuickLogin(account) {
 		setFeedback("");
-		const roles = account.role === "ADMIN"
-			? ["USER", "ADMIN"]
-			: account.role === "TECHNICIAN"
-				? ["USER", "TECHNICIAN"]
-				: ["USER"];
-		await signInLocal({ email: account.email, roles });
+		setEmail(account.email);
+		setRole(account.role);
+		try {
+			await signInDemo({ email: account.email, role: account.role });
+		} catch (error) {
+			setFeedback(error?.message || "Demo login failed. Try signing up first.");
+		}
 	}
 
 	return (
@@ -286,6 +290,13 @@ function LoginPage() {
 								>
 									Login
 								</button>
+
+								<p className="m-0 text-center text-sm text-slate-500">
+									Don&apos;t have an account?{" "}
+									<Link to="/signup" className="font-semibold text-blue-600 hover:text-blue-700">
+										Create one
+									</Link>
+								</p>
 
 								<div className="pt-1">
 									<p className="mb-2 text-center text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Or login with</p>

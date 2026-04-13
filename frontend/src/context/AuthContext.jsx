@@ -5,7 +5,9 @@ import {
 	getDefaultLoginUrl,
 	getDefaultLogoutUrl,
 	getLocalAuthProfile,
-	setLocalAuthProfile
+	loginLocal,
+	setLocalAuthProfile,
+	signupLocal
 } from "../features/auth/authApi";
 
 const AuthContext = createContext(null);
@@ -43,9 +45,38 @@ export function AuthProvider({ children }) {
 	const isAuthenticated = oauth2Enabled ? Boolean(profile?.authenticated) : Boolean(localSession?.email);
 
 	const signInLocal = useCallback(
-		async ({ email, roles: selectedRoles }) => {
+		async ({ email, password, role }) => {
+			const session = await loginLocal({ email, password, role });
+			const normalizedEmail = String(session?.email || email || "").trim().toLowerCase();
+			const normalizedRoles = Array.from(
+				new Set((session?.roles || ["USER"]).map((candidateRole) => String(candidateRole).trim().toUpperCase()))
+			);
+			setLocalAuthProfile({ email: normalizedEmail, roles: normalizedRoles });
+			setLocalSession({ email: normalizedEmail, roles: normalizedRoles });
+			return refreshProfile();
+		},
+		[refreshProfile]
+	);
+
+	const signInDemo = useCallback(
+		async ({ email, role }) => {
 			const normalizedEmail = String(email || "").trim().toLowerCase();
-			const normalizedRoles = Array.from(new Set((selectedRoles || ["USER"]).map((role) => String(role).trim().toUpperCase())));
+			const normalizedRole = String(role || "USER").trim().toUpperCase();
+			const normalizedRoles = Array.from(new Set(["USER", normalizedRole]));
+			setLocalAuthProfile({ email: normalizedEmail, roles: normalizedRoles });
+			setLocalSession({ email: normalizedEmail, roles: normalizedRoles });
+			return refreshProfile();
+		},
+		[refreshProfile]
+	);
+
+	const signUpLocal = useCallback(
+		async ({ email, password, role }) => {
+			const session = await signupLocal({ email, password, role });
+			const normalizedEmail = String(session?.email || email || "").trim().toLowerCase();
+			const normalizedRoles = Array.from(
+				new Set((session?.roles || ["USER"]).map((candidateRole) => String(candidateRole).trim().toUpperCase()))
+			);
 			setLocalAuthProfile({ email: normalizedEmail, roles: normalizedRoles });
 			setLocalSession({ email: normalizedEmail, roles: normalizedRoles });
 			return refreshProfile();
@@ -72,11 +103,13 @@ export function AuthProvider({ children }) {
 			logoutUrl: profile?.logoutUrl || getDefaultLogoutUrl(),
 			refreshProfile,
 			signInLocal,
+			signInDemo,
+			signUpLocal,
 			signOutLocal,
 			hasRole: (role) => roles.includes(role),
 			hasAnyRole: (candidateRoles = []) => candidateRoles.some((role) => roles.includes(role))
 		}),
-		[profile, roles, error, isLoadingProfile, oauth2Enabled, isAuthenticated, refreshProfile, signInLocal, signOutLocal]
+		[profile, roles, error, isLoadingProfile, oauth2Enabled, isAuthenticated, refreshProfile, signInLocal, signInDemo, signUpLocal, signOutLocal]
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

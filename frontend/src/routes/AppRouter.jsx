@@ -5,6 +5,7 @@ import CataloguePage from "../pages/CataloguePage";
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import NotificationsPage from "../pages/NotificationsPage";
+import SignupPage from "../pages/SignupPage";
 import TicketsPage from "../pages/TicketsPage";
 import RequireAuth from "./RequireAuth";
 
@@ -12,6 +13,7 @@ function AppRouter() {
 	return (
 		<Routes>
 			<Route path="/login" element={<LoginPage />} />
+			<Route path="/signup" element={<SignupPage />} />
 			<Route element={<RequireAuth />}>
 				<Route element={<AppLayout />}>
 					<Route path="/" element={<HomePage />} />

@@ -1,11 +1,18 @@
 package com.smartcampus.operationshub.controller;
 
+import com.smartcampus.operationshub.dto.AuthLoginRequest;
+import com.smartcampus.operationshub.dto.AuthSessionResponse;
+import com.smartcampus.operationshub.dto.AuthSignupRequest;
 import com.smartcampus.operationshub.dto.UserProfileResponse;
+import com.smartcampus.operationshub.entity.AppUser;
 import com.smartcampus.operationshub.security.OAuth2RoleService;
+import com.smartcampus.operationshub.service.CredentialAuthService;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +22,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,17 +39,36 @@ public class AuthController {
     private final String oauth2RegistrationId;
     private final String backendBaseUrl;
     private final OAuth2RoleService oauth2RoleService;
+    private final CredentialAuthService credentialAuthService;
 
     public AuthController(
             @Value("${app.security.oauth2.enabled:false}") boolean oauth2Enabled,
             @Value("${app.security.oauth2.registration-id:google}") String oauth2RegistrationId,
             @Value("${app.security.oauth2.backend-base-url:http://localhost:8080}") String backendBaseUrl,
-            OAuth2RoleService oauth2RoleService
+            OAuth2RoleService oauth2RoleService,
+            CredentialAuthService credentialAuthService
     ) {
         this.oauth2Enabled = oauth2Enabled;
         this.oauth2RegistrationId = oauth2RegistrationId;
         this.backendBaseUrl = backendBaseUrl;
         this.oauth2RoleService = oauth2RoleService;
+        this.credentialAuthService = credentialAuthService;
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<AuthSessionResponse> signup(@Valid @RequestBody AuthSignupRequest request) {
+        if (oauth2Enabled) {
+            throw new IllegalArgumentException("Local signup is disabled while OAuth2 mode is enabled.");
+        }
+        return ResponseEntity.ok(credentialAuthService.signup(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthSessionResponse> login(@Valid @RequestBody AuthLoginRequest request) {
+        if (oauth2Enabled) {
+            throw new IllegalArgumentException("Local login is disabled while OAuth2 mode is enabled.");
+        }
+        return ResponseEntity.ok(credentialAuthService.login(request));
     }
 
     @GetMapping("/me")
@@ -62,8 +90,10 @@ public class AuthController {
             email = GUEST_EMAIL;
         }
 
+        Optional<AppUser> localUser = oauth2Enabled ? Optional.empty() : credentialAuthService.findByEmail(email);
+
         Set<String> roleSet = new LinkedHashSet<>();
-        if (isAuthenticated) {
+        if (isAuthenticated && authentication != null && authentication.getAuthorities() != null) {
             for (GrantedAuthority authority : authentication.getAuthorities()) {
                 String authorityName = authority.getAuthority();
                 if (authorityName == null || authorityName.isBlank()) {
@@ -75,6 +105,8 @@ public class AuthController {
                     roleSet.add(authorityName);
                 }
             }
+        } else if (!oauth2Enabled && localUser.isPresent()) {
+            roleSet.addAll(credentialAuthService.resolveRoleHierarchy(localUser.get().getRole()));
         } else if (!oauth2Enabled && headerRoles != null && !headerRoles.isBlank()) {
             for (String token : headerRoles.split(",")) {
                 if (!token.isBlank()) {
@@ -87,11 +119,13 @@ public class AuthController {
             roleSet.add("USER");
         }
 
+        boolean locallyAuthenticated = !oauth2Enabled && localUser.isPresent();
+
         UserProfileResponse profile = new UserProfileResponse();
         profile.setEmail(email);
         profile.setDisplayName(buildDisplayName(email));
         profile.setRoles(new ArrayList<>(roleSet));
-        profile.setAuthenticated(isAuthenticated);
+        profile.setAuthenticated(isAuthenticated || locallyAuthenticated);
         profile.setOauth2Enabled(oauth2Enabled);
         profile.setLoginUrl(buildLoginUrl());
         profile.setLogoutUrl(buildLogoutUrl());

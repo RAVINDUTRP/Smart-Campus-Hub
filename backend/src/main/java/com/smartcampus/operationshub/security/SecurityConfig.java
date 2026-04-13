@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -42,6 +44,8 @@ public class SecurityConfig {
                 "/api/v1/health",
                 "/api/v1/public/**",
                 "/api/v1/auth/me",
+                "/api/v1/auth/login",
+                "/api/v1/auth/signup",
                 "/h2-console/**",
                 "/oauth2/**",
                 "/login/**"
@@ -119,5 +123,10 @@ public class SecurityConfig {
             return "sub";
         }
         return oauth2User.getAttributes().keySet().stream().findFirst().orElse("sub");
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
