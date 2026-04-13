@@ -10,6 +10,8 @@ const roleOptions = [
 	{ value: "ADMIN", label: "Administrator" }
 ];
 
+const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
+
 function SignupPage() {
 	const { isLoadingProfile, isAuthenticated, oauth2Enabled, loginUrl, signUpLocal } = useAuth();
 	const [email, setEmail] = useState("");
@@ -95,10 +97,15 @@ function SignupPage() {
 
 	return (
 		<section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
-			<div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-blue-400/25 blur-3xl" />
+			<div
+				className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+				style={{ backgroundImage: `url('${coverImage}')` }}
+			/>
+			<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-slate-950/70 via-blue-950/55 to-indigo-950/60" />
+			<div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl" />
 			<div className="pointer-events-none absolute -bottom-24 -right-16 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl" />
 
-			<div className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.12)] lg:grid-cols-[1.05fr_1.3fr]">
+			<div className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-white/30 bg-white/95 shadow-[0_20px_70px_rgba(15,23,42,0.35)] backdrop-blur-sm lg:grid-cols-[1.05fr_1.3fr]">
 				<div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8 text-white sm:p-10">
 					<div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
 						Smart Campus

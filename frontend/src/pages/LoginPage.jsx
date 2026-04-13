@@ -11,6 +11,14 @@ const demoAccounts = [
 	{ label: "Admin Demo", email: "admin@smartcampus.local", role: "ADMIN" }
 ];
 
+const roleLabels = {
+	USER: "Student / User",
+	TECHNICIAN: "Technician",
+	ADMIN: "Administrator"
+};
+
+const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
+
 function LoginPage() {
 	const { isLoadingProfile, oauth2Enabled, isAuthenticated, loginUrl, signInLocal, signInDemo, profile } = useAuth();
 	const [email, setEmail] = useState(profile?.email && profile.email !== "guest@smartcampus.local" ? profile.email : "");
@@ -19,6 +27,7 @@ function LoginPage() {
 	const [detectedRole, setDetectedRole] = useState("USER");
 	const [isDetectingRole, setIsDetectingRole] = useState(false);
 	const [feedback, setFeedback] = useState("");
+	const detectedRoleLabel = roleLabels[detectedRole] || detectedRole;
 
 	useEffect(() => {
 		if (oauth2Enabled) {
@@ -126,10 +135,15 @@ function LoginPage() {
 
 	return (
 		<section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
-			<div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-blue-400/25 blur-3xl" />
+			<div
+				className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+				style={{ backgroundImage: `url('${coverImage}')` }}
+			/>
+			<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-slate-950/70 via-blue-950/55 to-indigo-950/60" />
+			<div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl" />
 			<div className="pointer-events-none absolute -bottom-24 -right-16 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl" />
 
-			<div className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.12)] lg:grid-cols-[1.05fr_1.3fr]">
+			<div className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-white/30 bg-white/95 shadow-[0_20px_70px_rgba(15,23,42,0.35)] backdrop-blur-sm lg:grid-cols-[1.05fr_1.3fr]">
 				<div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8 text-white sm:p-10">
 					<div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
 						Smart Campus
@@ -256,9 +270,9 @@ function LoginPage() {
 									<div className="relative">
 										<input
 											type="text"
-											value={isDetectingRole ? "Detecting role..." : detectedRole}
+											value={isDetectingRole ? "Detecting role..." : detectedRoleLabel}
 											readOnly
-											className="h-10 w-full cursor-not-allowed rounded-xl border-0 bg-slate-100 px-3 pr-10 text-sm font-semibold text-slate-700 outline-none"
+											className="h-10 w-full cursor-not-allowed rounded-xl border-0 bg-slate-200 px-3 pr-10 text-sm font-semibold text-slate-700 outline-none ring-0 focus:ring-0"
 										/>
 										<span className="pointer-events-none absolute inset-y-0 right-3 inline-flex items-center text-slate-500">
 											<FaLock className="h-3.5 w-3.5" aria-hidden="true" />
