@@ -1,5 +1,15 @@
 package com.smartcampus.operationshub.service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.smartcampus.operationshub.dto.AuthLoginRequest;
 import com.smartcampus.operationshub.dto.AuthSessionResponse;
 import com.smartcampus.operationshub.dto.AuthSignupRequest;
@@ -8,14 +18,6 @@ import com.smartcampus.operationshub.entity.AppUserRole;
 import com.smartcampus.operationshub.exception.InvalidCredentialsException;
 import com.smartcampus.operationshub.exception.UserAlreadyExistsException;
 import com.smartcampus.operationshub.repository.AppUserRepository;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional

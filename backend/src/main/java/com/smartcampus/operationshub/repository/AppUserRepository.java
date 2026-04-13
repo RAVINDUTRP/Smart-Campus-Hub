@@ -1,8 +1,10 @@
 package com.smartcampus.operationshub.repository;
 
-import com.smartcampus.operationshub.entity.AppUser;
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.smartcampus.operationshub.entity.AppUser;
 
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 

@@ -1,19 +1,12 @@
 package com.smartcampus.operationshub.controller;
 
-import com.smartcampus.operationshub.dto.AuthLoginRequest;
-import com.smartcampus.operationshub.dto.AuthSessionResponse;
-import com.smartcampus.operationshub.dto.AuthSignupRequest;
-import com.smartcampus.operationshub.dto.UserProfileResponse;
-import com.smartcampus.operationshub.entity.AppUser;
-import com.smartcampus.operationshub.security.OAuth2RoleService;
-import com.smartcampus.operationshub.service.CredentialAuthService;
-import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -27,6 +20,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.smartcampus.operationshub.dto.AuthLoginRequest;
+import com.smartcampus.operationshub.dto.AuthSessionResponse;
+import com.smartcampus.operationshub.dto.AuthSignupRequest;
+import com.smartcampus.operationshub.dto.UserProfileResponse;
+import com.smartcampus.operationshub.entity.AppUser;
+import com.smartcampus.operationshub.security.OAuth2RoleService;
+import com.smartcampus.operationshub.service.CredentialAuthService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/auth")
