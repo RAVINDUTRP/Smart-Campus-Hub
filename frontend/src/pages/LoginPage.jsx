@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaApple, FaFacebookF } from "react-icons/fa";
+import { FaApple, FaEye, FaEyeSlash, FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -13,6 +13,8 @@ const demoAccounts = [
 function LoginPage() {
 	const { isLoadingProfile, oauth2Enabled, isAuthenticated, loginUrl, signInLocal, profile } = useAuth();
 	const [email, setEmail] = useState(profile?.email && profile.email !== "guest@smartcampus.local" ? profile.email : "");
+	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
 	const [role, setRole] = useState("USER");
 	const [feedback, setFeedback] = useState("");
 
@@ -36,7 +38,7 @@ function LoginPage() {
 
 	function handleOAuthSignIn(provider) {
 		if (!oauth2Enabled) {
-			setFeedback("Social login is not enabled yet. Complete backend OAuth setup first.");
+			setFeedback("");
 			return;
 		}
 		const targetUrl = getOAuthProviderUrl(provider);
@@ -45,6 +47,10 @@ function LoginPage() {
 			return;
 		}
 		window.location.assign(targetUrl);
+	}
+
+	function togglePasswordVisibility() {
+		setShowPassword((prev) => !prev);
 	}
 
 	async function handleLocalSignIn(event) {
@@ -57,8 +63,13 @@ function LoginPage() {
 			return;
 		}
 
+		if (!password.trim()) {
+			setFeedback("Password is required.");
+			return;
+		}
+
 		const roles = role === "ADMIN" ? ["USER", "ADMIN"] : role === "TECHNICIAN" ? ["USER", "TECHNICIAN"] : ["USER"];
-		await signInLocal({ email: normalizedEmail, roles });
+		await signInLocal({ email: normalizedEmail, password, roles });
 	}
 
 	async function handleQuickLogin(account) {
@@ -175,6 +186,30 @@ function LoginPage() {
 									/>
 								</label>
 								<label className="grid gap-1.5 text-sm font-semibold text-slate-700">
+									<span>Password</span>
+									<div className="group relative">
+										<input
+											type={showPassword ? "text" : "password"}
+											placeholder="Enter your password"
+											value={password}
+											onChange={(event) => setPassword(event.target.value)}
+											required
+											className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-14 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
+										/>
+										<button
+											type="button"
+											onClick={togglePasswordVisibility}
+											onMouseDown={(event) => event.preventDefault()}
+											className="absolute right-1 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg border border-slate-300 bg-slate-100 text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-400 hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 group-focus-within:border-blue-400"
+											aria-label={showPassword ? "Password is visible. Hide password" : "Password is hidden. Show password"}
+											title={showPassword ? "Hide password" : "Show password"}
+											aria-pressed={showPassword}
+										>
+											{showPassword ? <FaEye className="h-6 w-6" /> : <FaEyeSlash className="h-6 w-6" />}
+										</button>
+									</div>
+								</label>
+								<label className="grid gap-1.5 text-sm font-semibold text-slate-700">
 									<span>Role</span>
 									<select
 										value={role}
@@ -195,7 +230,7 @@ function LoginPage() {
 								</button>
 
 								<div className="pt-1">
-									<p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Or login with</p>
+									<p className="mb-2 text-center text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Or login with</p>
 									<div className="grid grid-cols-3 gap-3">
 										<button
 											type="button"
