@@ -41,8 +41,10 @@ export function AuthProvider({ children }) {
 	}, [refreshProfile]);
 
 	const oauth2Enabled = Boolean(profile?.oauth2Enabled);
-	const roles = oauth2Enabled ? profile?.roles || [] : localSession?.roles || [];
-	const isAuthenticated = oauth2Enabled ? Boolean(profile?.authenticated) : Boolean(localSession?.email);
+	const isOauthAuthenticated = Boolean(profile?.authenticated);
+	const isLocalAuthenticated = Boolean(localSession?.email);
+	const roles = isOauthAuthenticated ? profile?.roles || [] : localSession?.roles || [];
+	const isAuthenticated = isOauthAuthenticated || isLocalAuthenticated;
 
 	const signInLocal = useCallback(
 		async ({ email, password, role }) => {

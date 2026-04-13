@@ -62,25 +62,16 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<AuthSessionResponse> signup(@Valid @RequestBody AuthSignupRequest request) {
-        if (oauth2Enabled) {
-            throw new IllegalArgumentException("Local signup is disabled while OAuth2 mode is enabled.");
-        }
         return ResponseEntity.ok(credentialAuthService.signup(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthSessionResponse> login(@Valid @RequestBody AuthLoginRequest request) {
-        if (oauth2Enabled) {
-            throw new IllegalArgumentException("Local login is disabled while OAuth2 mode is enabled.");
-        }
         return ResponseEntity.ok(credentialAuthService.login(request));
     }
 
     @GetMapping("/role")
     public ResponseEntity<AuthRoleResponse> resolveRole(@RequestParam("email") String email) {
-        if (oauth2Enabled) {
-            throw new IllegalArgumentException("Local role lookup is disabled while OAuth2 mode is enabled.");
-        }
         String normalizedEmail = normalizeEmail(email, "");
         if (normalizedEmail.isBlank()) {
             throw new IllegalArgumentException("Email is required.");
@@ -105,13 +96,13 @@ public class AuthController {
         String email;
         if (isAuthenticated) {
             email = resolveAuthenticatedEmail(authentication);
-        } else if (!oauth2Enabled) {
+        } else if (headerEmail != null && !headerEmail.isBlank()) {
             email = normalizeEmail(headerEmail, GUEST_EMAIL);
         } else {
             email = GUEST_EMAIL;
         }
 
-        Optional<AppUser> localUser = oauth2Enabled ? Optional.empty() : credentialAuthService.findByEmail(email);
+        Optional<AppUser> localUser = credentialAuthService.findByEmail(email);
 
         Set<String> roleSet = new LinkedHashSet<>();
         if (isAuthenticated && authentication != null && authentication.getAuthorities() != null) {
@@ -126,9 +117,9 @@ public class AuthController {
                     roleSet.add(authorityName);
                 }
             }
-        } else if (!oauth2Enabled && localUser.isPresent()) {
+        } else if (localUser.isPresent()) {
             roleSet.addAll(credentialAuthService.resolveRoleHierarchy(localUser.get().getRole()));
-        } else if (!oauth2Enabled && headerRoles != null && !headerRoles.isBlank()) {
+        } else if (headerRoles != null && !headerRoles.isBlank()) {
             for (String token : headerRoles.split(",")) {
                 if (!token.isBlank()) {
                     roleSet.add(token.trim().toUpperCase(Locale.ROOT));
@@ -140,7 +131,7 @@ public class AuthController {
             roleSet.add("USER");
         }
 
-        boolean locallyAuthenticated = !oauth2Enabled && localUser.isPresent();
+        boolean locallyAuthenticated = localUser.isPresent() || (headerEmail != null && !headerEmail.isBlank());
 
         UserProfileResponse profile = new UserProfileResponse();
         profile.setEmail(email);

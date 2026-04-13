@@ -30,10 +30,6 @@ function LoginPage() {
 	const detectedRoleLabel = roleLabels[detectedRole] || detectedRole;
 
 	useEffect(() => {
-		if (oauth2Enabled) {
-			return;
-		}
-
 		const normalizedEmail = email.trim().toLowerCase();
 		if (!normalizedEmail) {
 			setDetectedRole("USER");
@@ -84,16 +80,16 @@ function LoginPage() {
 	}
 
 	function handleOAuthSignIn(provider) {
-		if (!oauth2Enabled) {
-			setFeedback("");
-			return;
-		}
 		const targetUrl = getOAuthProviderUrl(provider);
 		if (!targetUrl) {
 			setFeedback("Login URL is not configured.");
 			return;
 		}
 		window.location.assign(targetUrl);
+	}
+
+	function handleComingSoonProvider(providerName) {
+		setFeedback(`${providerName} login is not enabled. Please use Google login.`);
 	}
 
 	function togglePasswordVisibility() {
@@ -172,13 +168,9 @@ function LoginPage() {
 				<div className="flex items-center bg-white/96 p-7 shadow-[-16px_0_30px_rgba(15,23,42,0.12)] sm:p-8">
 					<div className="mx-auto w-full max-w-lg">
 					<h2 className="m-0 text-2xl font-black tracking-tight text-slate-900">Sign In</h2>
-					<p className="mt-2 text-sm text-slate-500">
-						{oauth2Enabled
-							? "Sign in with Google to access Smart Campus."
-							: "Sign in to manage campus resources and services."}
-					</p>
+					<p className="mt-2 text-sm text-slate-500">Sign in to manage campus resources and services.</p>
 
-					{oauth2Enabled ? (
+					{false ? (
 						<div className="mt-7 space-y-4">
 							<p className="text-sm font-semibold text-slate-600">Continue with social account</p>
 							<div className="grid grid-cols-3 gap-3">
@@ -312,7 +304,7 @@ function LoginPage() {
 										</button>
 										<button
 											type="button"
-											onClick={() => handleOAuthSignIn("facebook")}
+											onClick={() => handleComingSoonProvider("Facebook")}
 											className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 											aria-label="Login with Facebook"
 											title="Login with Facebook"
@@ -322,7 +314,7 @@ function LoginPage() {
 										</button>
 										<button
 											type="button"
-											onClick={() => handleOAuthSignIn("apple")}
+											onClick={() => handleComingSoonProvider("Apple")}
 											className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 											aria-label="Login with Apple"
 											title="Login with Apple"

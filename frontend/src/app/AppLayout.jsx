@@ -13,14 +13,13 @@ function AppLayout() {
 	const { profile, oauth2Enabled, logoutUrl, signOutLocal } = useAuth();
 	const navItems = baseNavItems;
 
-	function handleSignOut() {
+	async function handleSignOut() {
+		await signOutLocal();
 		if (oauth2Enabled) {
 			window.location.assign(logoutUrl);
 			return;
 		}
-		signOutLocal().finally(() => {
-			window.location.assign("/login");
-		});
+		window.location.assign("/login");
 	}
 
 	return (
@@ -29,9 +28,7 @@ function AppLayout() {
 				<h1>Smart Campus Hub</h1>
 				{profile && (
 					<div className="profile-card">
-						<p className="profile-name">{profile.displayName}</p>
 						<p className="profile-email">{profile.email}</p>
-						<p className="profile-roles">{(profile.roles || []).join(" • ")}</p>
 					</div>
 				)}
 				<nav>

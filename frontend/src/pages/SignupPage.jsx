@@ -13,7 +13,7 @@ const roleOptions = [
 const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
 
 function SignupPage() {
-	const { isLoadingProfile, isAuthenticated, oauth2Enabled, loginUrl, signUpLocal } = useAuth();
+	const { isLoadingProfile, isAuthenticated, loginUrl, signUpLocal } = useAuth();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
@@ -67,10 +67,6 @@ function SignupPage() {
 	}
 
 	function handleOAuthSignIn(provider) {
-		if (!oauth2Enabled) {
-			setFeedback("");
-			return;
-		}
 		const targetUrl = getOAuthProviderUrl(provider);
 		if (!targetUrl) {
 			setFeedback("Login URL is not configured.");
@@ -79,20 +75,8 @@ function SignupPage() {
 		window.location.assign(targetUrl);
 	}
 
-	if (oauth2Enabled) {
-		return (
-			<section className="relative flex min-h-screen items-center justify-center bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
-				<div className="mx-auto w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
-					<h1 className="m-0 text-2xl font-black text-slate-900">Signup disabled in OAuth mode</h1>
-					<p className="mt-3 text-sm text-slate-600">Local account signup is disabled while OAuth authentication is enabled.</p>
-					<p className="mt-4 text-sm">
-						<Link to="/login" className="font-semibold text-blue-600 hover:text-blue-700">
-							Back to login
-						</Link>
-					</p>
-				</div>
-			</section>
-		);
+	function handleComingSoonProvider(providerName) {
+		setFeedback(`${providerName} login is not enabled. Please use Google login.`);
 	}
 
 	return (
@@ -267,7 +251,7 @@ function SignupPage() {
 									</button>
 									<button
 										type="button"
-										onClick={() => handleOAuthSignIn("facebook")}
+										onClick={() => handleComingSoonProvider("Facebook")}
 										className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 										aria-label="Login with Facebook"
 										title="Login with Facebook"
@@ -277,7 +261,7 @@ function SignupPage() {
 									</button>
 									<button
 										type="button"
-										onClick={() => handleOAuthSignIn("apple")}
+										onClick={() => handleComingSoonProvider("Apple")}
 										className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 										aria-label="Login with Apple"
 										title="Login with Apple"
