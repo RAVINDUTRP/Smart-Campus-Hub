@@ -18,6 +18,29 @@ function getErrorMessage(error) {
 	return apiError?.message || error.message || "Request failed";
 }
 
+function getAccentColor(type) {
+	if (!type) {
+		return "#94a3b8";
+	}
+
+	if (type.startsWith("BOOKING")) {
+		return "#2563eb";
+	}
+
+	if (type.startsWith("TICKET")) {
+		return "#f59e0b";
+	}
+
+	return "#94a3b8";
+}
+
+function getTypeLabel(type) {
+	if (!type) {
+		return "GENERAL";
+	}
+	return type.replaceAll("_", " ");
+}
+
 function NotificationsPage() {
 	const { profile } = useAuth();
 	const [recipientEmail, setRecipientEmail] = useState("");
@@ -68,60 +91,239 @@ function NotificationsPage() {
 		}
 	}
 
-	return (
-		<section>
-			<header className="section-header">
-				<h2>Notifications</h2>
-				<p>Review booking and ticket alerts, then mark updates as read.</p>
-			</header>
+	const loadedReadCount = notifications.filter((notification) => notification.read).length;
 
-			<article className="panel-card">
-				<div className="notifications-toolbar">
-					<label>
-						<span>Recipient Email</span>
-						<input type="email" value={recipientEmail} readOnly />
-					</label>
-					<label className="checkbox-row">
-						<input
-							type="checkbox"
-							checked={unreadOnly}
-							onChange={(event) => setUnreadOnly(event.target.checked)}
-						/>
-						<span>Unread only</span>
-					</label>
-					<div className="form-actions">
-						<button type="button" onClick={() => loadNotifications()}>
-							Load Notifications
-						</button>
+	return (
+		<section className="grid gap-4">
+
+			{/* ── HEADER (redesigned) ───────────────────────────────────────── */}
+			<header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 p-7 shadow-2xl">
+				{/* Decorative blobs */}
+				<div className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
+				<div className="pointer-events-none absolute -bottom-10 right-0 h-48 w-48 rounded-full bg-indigo-400/15 blur-2xl" />
+
+				<div className="relative flex flex-wrap items-center justify-between gap-4">
+					<div>
+						{/* Live badge */}
+						<div className="mb-3 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm">
+							<span className="relative flex h-2.5 w-2.5">
+								<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+								<span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+							</span>
+							<span className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-emerald-300">
+								Live · Active Center
+							</span>
+						</div>
+						<h2 className="m-0 text-[2.1rem] font-black leading-tight tracking-tight text-white">
+							Notifications
+						</h2>
+						<p className="m-0 mt-1 text-sm text-slate-400">
+							Review booking and ticket alerts, then mark updates as read.
+						</p>
+					</div>
+
+					{/* Unread count pill */}
+					<div className="flex flex-col items-end gap-1">
+						<span className="text-[0.65rem] font-bold uppercase tracking-widest text-slate-500">
+							Unread
+						</span>
+						<span className="rounded-2xl bg-blue-500/20 px-5 py-2 text-[2rem] font-black tabular-nums text-blue-300 ring-1 ring-blue-400/20">
+							{unreadCount}
+						</span>
 					</div>
 				</div>
-				<p className="muted">Unread count: {unreadCount}</p>
+			</header>
 
-				{feedback.text && (
-					<p className={feedback.type === "error" ? "feedback error" : "feedback success"}>{feedback.text}</p>
-				)}
+			{/* ── CONTROL PANEL (redesigned) ────────────────────────────────── */}
+			<article className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm ring-1 ring-black/[0.04]">
+				{/* Top gradient stripe */}
+				<div className="h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
+
+				<div className="p-6">
+					<p className="mb-4 text-[0.72rem] font-black uppercase tracking-[0.15em] text-slate-400">
+						Fetch Settings
+					</p>
+
+					{/* Input row */}
+					<div className="flex flex-wrap items-stretch gap-3">
+
+						{/* Email input with icon */}
+						<div className="relative flex min-w-[260px] flex-1 items-center overflow-hidden rounded-2xl border border-slate-200/90 bg-gradient-to-b from-slate-50 to-white transition-all duration-200 hover:border-slate-300 focus-within:border-blue-400 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]">
+							<div className="pointer-events-none flex h-12 w-12 flex-shrink-0 items-center justify-center border-r border-slate-200/80 text-slate-400">
+								<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+									<rect width="20" height="16" x="2" y="4" rx="2" />
+									<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+								</svg>
+							</div>
+							<input
+								id="recipientEmail"
+								type="email"
+								value={recipientEmail}
+								onChange={(event) => setRecipientEmail(event.target.value)}
+								placeholder="student1@smartcampus.local"
+								className="h-12 flex-1 border-0 bg-transparent px-3 text-[0.95rem] font-medium text-slate-800 shadow-none outline-none ring-0 caret-blue-600 transition-colors duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-0 focus:outline-none focus-visible:outline-none focus:ring-0"
+							/>
+						</div>
+
+						{/* Unread toggle */}
+						<label
+							className={`flex h-12 cursor-pointer items-center gap-3 rounded-2xl border px-4 transition-all duration-200 ${
+								unreadOnly
+									? "border-indigo-200 bg-indigo-50 shadow-[0_0_0_3px_rgba(99,102,241,0.08)]"
+									: "border-slate-200 bg-slate-50 hover:border-slate-300"
+							}`}
+						>
+							<input
+								type="checkbox"
+								checked={unreadOnly}
+								onChange={(event) => setUnreadOnly(event.target.checked)}
+								className="peer sr-only"
+							/>
+							{/* Animated toggle track */}
+							<span
+								className={`relative inline-flex h-[22px] w-10 flex-shrink-0 items-center rounded-full transition-all duration-300 ${
+									unreadOnly ? "bg-indigo-500" : "bg-slate-300"
+								}`}
+							>
+								<span
+									className={`inline-block h-[16px] w-[16px] transform rounded-full bg-white shadow-md transition-transform duration-300 ${
+										unreadOnly ? "translate-x-[18px]" : "translate-x-[3px]"
+									}`}
+								/>
+							</span>
+							<span
+								className={`select-none whitespace-nowrap text-[0.88rem] font-semibold transition-colors ${
+									unreadOnly ? "text-indigo-700" : "text-slate-600"
+								}`}
+							>
+								Unread only
+							</span>
+						</label>
+
+						{/* Load Notifications button */}
+						<button
+							type="button"
+							onClick={() => loadNotifications()}
+							className="group relative h-12 min-w-[170px] overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 text-[0.9rem] font-bold text-white shadow-md transition-all duration-200 hover:shadow-[0_4px_20px_rgba(79,70,229,0.4)] active:scale-[0.98]"
+						>
+							<span className="relative z-10 flex items-center justify-center gap-2">
+								<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform duration-200 group-hover:rotate-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+									<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+									<path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+								</svg>
+								Load Notifications
+							</span>
+							{/* Shimmer sweep on hover */}
+							<span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-full" />
+						</button>
+					</div>
+
+					<p className="mt-2.5 text-[0.8rem] text-slate-400">
+						Use your account email to fetch personal updates.
+					</p>
+
+					{/* Feedback banner */}
+					{feedback.text && (
+						<p
+							className={`mt-4 flex items-center gap-2 rounded-2xl border px-4 py-3 text-[0.88rem] font-semibold ${
+								feedback.type === "error"
+									? "border-red-100 bg-red-50 text-red-600"
+									: "border-emerald-100 bg-emerald-50 text-emerald-700"
+							}`}
+						>
+							{feedback.type === "error" ? "⚠️" : "✅"} {feedback.text}
+						</p>
+					)}
+				</div>
+
+				{/* Stat cards — separated by hairline grid */}
+				<div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100">
+					<div className="p-5">
+						<div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-blue-600">Unread</p>
+							<p className="m-0 mt-2 text-[2rem] font-black leading-none tabular-nums text-blue-700">{unreadCount}</p>
+						</div>
+					</div>
+					<div className="p-5">
+						<div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-slate-500">Loaded</p>
+							<p className="m-0 mt-2 text-[2rem] font-black leading-none tabular-nums text-slate-800">{notifications.length}</p>
+						</div>
+					</div>
+					<div className="p-5">
+						<div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-emerald-600">Read (loaded)</p>
+							<p className="m-0 mt-2 text-[2rem] font-black leading-none tabular-nums text-emerald-700">{loadedReadCount}</p>
+						</div>
+					</div>
+				</div>
+			</article>
+
+			{/* ── NOTIFICATIONS LIST (unchanged) ───────────────────────────── */}
+			<article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<div className="mb-3 flex justify-end">
+					<span
+						className={`inline-flex items-center rounded-full px-3 py-1 text-[0.78rem] font-semibold ${
+							unreadOnly ? "bg-blue-100 text-blue-800" : "bg-slate-200 text-slate-700"
+						}`}
+					>
+						{unreadOnly ? "Unread filter on" : "All notifications"}
+					</span>
+				</div>
 
 				{isLoading ? (
-					<p>Loading notifications...</p>
+					<div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+						<p className="m-0 text-slate-600">Loading notifications...</p>
+					</div>
 				) : notifications.length === 0 ? (
-					<p>No notifications found. Trigger a booking or ticket update and reload.</p>
+					<div className="rounded-2xl border border-dashed border-slate-300 bg-gradient-to-b from-white to-slate-50 p-6 text-center">
+						<p className="m-0 mb-1 text-2xl">🔔</p>
+						<p className="m-0 mb-1 text-[1.25rem] font-bold text-slate-700">
+							No notifications found
+						</p>
+						<p className="m-0 text-slate-500">
+							Trigger a booking or ticket update, then click Load Notifications.
+						</p>
+					</div>
 				) : (
-					<ul className="notification-list">
+					<ul className="grid gap-3">
 						{notifications.map((notification) => (
-							<li key={notification.id} className={notification.read ? "notification-item read" : "notification-item"}>
-								<div>
-									<p className="notification-title">{notification.title}</p>
-									<p className="notification-message">{notification.message}</p>
-									<p className="notification-meta">
+							<li
+								key={notification.id}
+								className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm ${
+									notification.read
+										? "border-slate-200 bg-slate-50"
+										: "border-slate-200 bg-white hover:-translate-y-[1px] hover:shadow-md"
+								}`}
+								style={{ borderLeft: `4px solid ${getAccentColor(notification.type)}` }}
+							>
+								<div className="min-w-0 flex-1">
+									<div className="mb-1.5 flex flex-wrap items-center gap-2">
+										<span
+											className="inline-flex rounded-full px-2 py-1 text-[0.72rem] font-bold uppercase tracking-wide"
+											style={{ background: `${getAccentColor(notification.type)}20`, color: getAccentColor(notification.type) }}
+										>
+											{getTypeLabel(notification.type)}
+										</span>
+									</div>
+									<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-800">
+										{notification.title}
+									</p>
+									<p className="m-0 mb-2 text-slate-600">
+										{notification.message}
+									</p>
+									<p className="m-0 text-[0.85rem] text-slate-500">
 										{notification.type} • {formatTimestamp(notification.createdAt)}
 									</p>
 								</div>
 								{notification.read ? (
-									<span className="status-chip active">Read</span>
+									<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
+										Read
+									</span>
 								) : (
 									<button
 										type="button"
-										className="small-btn"
+										className="h-9 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700"
 										onClick={() => handleMarkAsRead(notification.id)}
 									>
 										Mark Read

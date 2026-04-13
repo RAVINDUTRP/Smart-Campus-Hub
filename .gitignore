@@ -26,3 +26,6 @@ frontend/.vite/
 # Test outputs
 coverage/
 reports/
+# Docker compose (contains secrets)
+docker-compose.yml
+.env.docker
