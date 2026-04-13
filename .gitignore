@@ -9,6 +9,9 @@
 # Backend build outputs
 backend/target/
 backend/.mvn/
+backend/data/
+backend/*.mv.db
+backend/*.trace.db
 
 # Frontend build outputs and dependencies
 frontend/node_modules/
@@ -18,6 +21,7 @@ frontend/.vite/
 # Environment files
 .env
 .env.*
+!backend/.env.shared.example
 
 # Test outputs
 coverage/

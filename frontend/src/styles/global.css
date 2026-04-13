@@ -73,6 +73,19 @@ body {
 	color: #ffffff;
 }
 
+.sidebar-auth-actions {
+	margin-top: 14px;
+	padding-top: 12px;
+	border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.sidebar-auth-actions .ghost-btn {
+	width: 100%;
+	background: rgba(238, 243, 251, 0.16);
+	color: #e7f0ff;
+	border-color: rgba(200, 214, 234, 0.35);
+}
+
 .content {
 	padding: 28px;
 }

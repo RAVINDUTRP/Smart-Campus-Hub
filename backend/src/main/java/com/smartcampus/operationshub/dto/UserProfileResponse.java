@@ -9,6 +9,8 @@ public class UserProfileResponse {
     private List<String> roles;
     private boolean authenticated;
     private boolean oauth2Enabled;
+    private String loginUrl;
+    private String logoutUrl;
 
     public String getEmail() {
         return email;
@@ -48,5 +50,21 @@ public class UserProfileResponse {
 
     public void setOauth2Enabled(boolean oauth2Enabled) {
         this.oauth2Enabled = oauth2Enabled;
+    }
+
+    public String getLoginUrl() {
+        return loginUrl;
+    }
+
+    public void setLoginUrl(String loginUrl) {
+        this.loginUrl = loginUrl;
+    }
+
+    public String getLogoutUrl() {
+        return logoutUrl;
+    }
+
+    public void setLogoutUrl(String logoutUrl) {
+        this.logoutUrl = logoutUrl;
     }
 }
