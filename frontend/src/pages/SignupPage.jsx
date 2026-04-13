@@ -107,7 +107,10 @@ function SignupPage() {
 
 			<div className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-white/30 bg-white/95 shadow-[0_20px_70px_rgba(15,23,42,0.35)] backdrop-blur-sm lg:grid-cols-[1.05fr_1.3fr]">
 				<div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8 text-white sm:p-10">
-					<div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
+					<div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
+						<span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-900/70 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+							<span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.85)]" />
+						</span>
 						Smart Campus
 					</div>
 					<h1 className="mt-5 text-3xl font-black leading-tight">Create your account</h1>
