@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FaApple, FaEye, FaEyeSlash, FaFacebookF } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
+import { FaApple, FaChevronDown, FaEye, FaEyeSlash, FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -10,13 +10,36 @@ const demoAccounts = [
 	{ label: "Admin Demo", email: "admin@smartcampus.local", role: "ADMIN" }
 ];
 
+const roleOptions = [
+	{ value: "USER", label: "Student / User" },
+	{ value: "TECHNICIAN", label: "Technician" },
+	{ value: "ADMIN", label: "Administrator" }
+];
+
 function LoginPage() {
 	const { isLoadingProfile, oauth2Enabled, isAuthenticated, loginUrl, signInLocal, profile } = useAuth();
 	const [email, setEmail] = useState(profile?.email && profile.email !== "guest@smartcampus.local" ? profile.email : "");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const [role, setRole] = useState("USER");
+	const [isRoleOpen, setIsRoleOpen] = useState(false);
 	const [feedback, setFeedback] = useState("");
+	const roleDropdownRef = useRef(null);
+
+	useEffect(() => {
+		function handleClickOutside(event) {
+			if (roleDropdownRef.current && !roleDropdownRef.current.contains(event.target)) {
+				setIsRoleOpen(false);
+			}
+		}
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, []);
+
+	useEffect(() => {
+		setIsRoleOpen(false);
+	}, [role]);
 
 	if (isLoadingProfile) {
 		return <p>Checking authentication status...</p>;
@@ -51,6 +74,11 @@ function LoginPage() {
 
 	function togglePasswordVisibility() {
 		setShowPassword((prev) => !prev);
+	}
+
+	function handleRoleSelect(nextRole) {
+		setRole(nextRole);
+		setIsRoleOpen(false);
 	}
 
 	async function handleLocalSignIn(event) {
@@ -110,13 +138,13 @@ function LoginPage() {
 					</div>
 				</div>
 
-				<div className="flex items-center p-8 sm:p-10">
-					<div className="mx-auto w-full max-w-xl">
+				<div className="flex items-center p-7 sm:p-8">
+					<div className="mx-auto w-full max-w-lg">
 					<h2 className="m-0 text-2xl font-black tracking-tight text-slate-900">Sign In</h2>
 					<p className="mt-2 text-sm text-slate-500">
 						{oauth2Enabled
-							? "Use your Google account to continue securely."
-							: "Use quick demo access or enter an email and role to continue."}
+							? "Sign in with Google to access Smart Campus."
+							: "Sign in to manage campus resources and services."}
 					</p>
 
 					{oauth2Enabled ? (
@@ -126,7 +154,7 @@ function LoginPage() {
 								<button
 									type="button"
 									onClick={() => handleOAuthSignIn("google")}
-									className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+									className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 									aria-label="Login with Google"
 									title="Login with Google"
 								>
@@ -136,7 +164,7 @@ function LoginPage() {
 								<button
 									type="button"
 									onClick={() => handleOAuthSignIn("facebook")}
-									className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+									className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 									aria-label="Login with Facebook"
 									title="Login with Facebook"
 								>
@@ -146,7 +174,7 @@ function LoginPage() {
 								<button
 									type="button"
 									onClick={() => handleOAuthSignIn("apple")}
-									className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+									className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 									aria-label="Login with Apple"
 									title="Login with Apple"
 								>
@@ -156,7 +184,7 @@ function LoginPage() {
 							</div>
 						</div>
 					) : (
-						<div className="mt-7 space-y-5">
+						<div className="mt-6 space-y-4">
 							<div>
 								<p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Quick Demo Access</p>
 								<div className="grid gap-2 sm:grid-cols-3">
@@ -165,7 +193,7 @@ function LoginPage() {
 											key={account.email}
 											type="button"
 											onClick={() => handleQuickLogin(account)}
-											className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+											className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[0.92rem] font-semibold text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
 										>
 											{account.label}
 										</button>
@@ -182,7 +210,7 @@ function LoginPage() {
 										value={email}
 										onChange={(event) => setEmail(event.target.value)}
 										required
-										className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
+										className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
 									/>
 								</label>
 								<label className="grid gap-1.5 text-sm font-semibold text-slate-700">
@@ -194,37 +222,67 @@ function LoginPage() {
 											value={password}
 											onChange={(event) => setPassword(event.target.value)}
 											required
-											className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-14 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
+											className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-12 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
 										/>
 										<button
 											type="button"
 											onClick={togglePasswordVisibility}
 											onMouseDown={(event) => event.preventDefault()}
-											className="absolute right-1 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg border border-slate-300 bg-slate-100 text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-400 hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 group-focus-within:border-blue-400"
+											className="absolute right-1 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg border border-slate-300 bg-slate-100 text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-400 hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 group-focus-within:border-blue-400"
 											aria-label={showPassword ? "Password is visible. Hide password" : "Password is hidden. Show password"}
 											title={showPassword ? "Hide password" : "Show password"}
 											aria-pressed={showPassword}
 										>
-											{showPassword ? <FaEye className="h-6 w-6" /> : <FaEyeSlash className="h-6 w-6" />}
+											{showPassword ? <FaEye className="h-5 w-5" /> : <FaEyeSlash className="h-5 w-5" />}
 										</button>
 									</div>
 								</label>
 								<label className="grid gap-1.5 text-sm font-semibold text-slate-700">
 									<span>Role</span>
-									<select
-										value={role}
-										onChange={(event) => setRole(event.target.value)}
-										className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-800 outline-none transition-all duration-200 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
-									>
-										<option value="USER">USER</option>
-										<option value="TECHNICIAN">TECHNICIAN</option>
-										<option value="ADMIN">ADMIN</option>
-									</select>
+									<div className="relative z-10" ref={roleDropdownRef}>
+										<button
+											type="button"
+											onClick={() => setIsRoleOpen((prev) => !prev)}
+											className="h-11 w-full rounded-2xl bg-white px-4 pr-11 text-left text-[0.93rem] font-semibold text-slate-800 outline-none shadow-[inset_0_0_0_1px_rgba(148,163,184,0.22),0_6px_18px_rgba(15,23,42,0.06)] transition-all duration-200 hover:shadow-[inset_0_0_0_1px_rgba(148,163,184,0.32),0_10px_22px_rgba(15,23,42,0.08)] focus-visible:shadow-[inset_0_0_0_1px_rgba(59,130,246,0.55),0_0_0_4px_rgba(59,130,246,0.14)]"
+											aria-haspopup="listbox"
+											aria-expanded={isRoleOpen}
+										>
+											{roleOptions.find((option) => option.value === role)?.label}
+										</button>
+										<span className="pointer-events-none absolute inset-y-0 right-3 inline-flex items-center text-slate-500">
+											<FaChevronDown className="h-3.5 w-3.5" />
+										</span>
+										{isRoleOpen && (
+											<ul
+												className="absolute left-0 right-0 top-full z-20 mt-1.5 m-0 list-none space-y-1 rounded-xl border border-slate-700 bg-slate-900 p-1.5 shadow-[0_12px_24px_rgba(2,6,23,0.38)]"
+												role="listbox"
+											>
+												{roleOptions.map((option) => (
+													<li key={option.value} className="list-none" role="option" aria-selected={role === option.value}>
+														<button
+															type="button"
+															onMouseDown={(event) => {
+																event.preventDefault();
+																handleRoleSelect(option.value);
+															}}
+															className={`w-full rounded-lg px-3.5 py-2.5 text-left text-[0.92rem] font-semibold transition-colors duration-150 ${
+																role === option.value
+																	? "bg-slate-700 text-white"
+																	: "text-slate-200 hover:bg-slate-800 hover:text-white"
+															}`}
+														>
+															{option.label}
+														</button>
+													</li>
+												))}
+											</ul>
+										)}
+									</div>
 								</label>
 
 								<button
 									type="submit"
-									className="h-11 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+									className="h-10 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
 								>
 									Login
 								</button>
@@ -235,7 +293,7 @@ function LoginPage() {
 										<button
 											type="button"
 											onClick={() => handleOAuthSignIn("google")}
-											className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+											className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 											aria-label="Login with Google"
 											title="Login with Google"
 										>
@@ -245,7 +303,7 @@ function LoginPage() {
 										<button
 											type="button"
 											onClick={() => handleOAuthSignIn("facebook")}
-											className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+											className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 											aria-label="Login with Facebook"
 											title="Login with Facebook"
 										>
@@ -255,7 +313,7 @@ function LoginPage() {
 										<button
 											type="button"
 											onClick={() => handleOAuthSignIn("apple")}
-											className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+											className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
 											aria-label="Login with Apple"
 											title="Login with Apple"
 										>
