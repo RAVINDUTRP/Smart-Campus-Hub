@@ -166,7 +166,7 @@ function LoginPage() {
 					</div>
 				</div>
 
-				<div className="flex items-center p-7 sm:p-8">
+				<div className="flex items-center bg-white/96 p-7 shadow-[-16px_0_30px_rgba(15,23,42,0.12)] sm:p-8">
 					<div className="mx-auto w-full max-w-lg">
 					<h2 className="m-0 text-2xl font-black tracking-tight text-slate-900">Sign In</h2>
 					<p className="mt-2 text-sm text-slate-500">
@@ -238,7 +238,7 @@ function LoginPage() {
 										value={email}
 										onChange={(event) => setEmail(event.target.value)}
 										required
-										className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
+										className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_10px_rgba(15,23,42,0.08)] outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12),0_8px_20px_rgba(37,99,235,0.15)]"
 									/>
 								</label>
 								<label className="grid gap-1.5 text-sm font-semibold text-slate-700">
@@ -250,7 +250,7 @@ function LoginPage() {
 											value={password}
 											onChange={(event) => setPassword(event.target.value)}
 											required
-											className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-10 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12)]"
+											className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-10 text-sm text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_10px_rgba(15,23,42,0.08)] outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12),0_8px_20px_rgba(37,99,235,0.15)]"
 										/>
 										<button
 											type="button"
@@ -272,7 +272,7 @@ function LoginPage() {
 											type="text"
 											value={isDetectingRole ? "Detecting role..." : detectedRoleLabel}
 											readOnly
-											className="h-10 w-full cursor-not-allowed rounded-xl border-0 bg-slate-200 px-3 pr-10 text-sm font-semibold text-slate-700 outline-none ring-0 focus:ring-0"
+											className="h-10 w-full cursor-not-allowed rounded-xl border-0 bg-slate-200 px-3 pr-10 text-sm font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_4px_10px_rgba(15,23,42,0.08)] outline-none ring-0 focus:ring-0"
 										/>
 										<span className="pointer-events-none absolute inset-y-0 right-3 inline-flex items-center text-slate-500">
 											<FaLock className="h-3.5 w-3.5" aria-hidden="true" />
