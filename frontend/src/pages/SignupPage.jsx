@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FaChevronDown, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaApple, FaChevronDown, FaEye, FaEyeSlash, FaFacebookF } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -10,7 +11,7 @@ const roleOptions = [
 ];
 
 function SignupPage() {
-	const { isLoadingProfile, isAuthenticated, oauth2Enabled, signUpLocal } = useAuth();
+	const { isLoadingProfile, isAuthenticated, oauth2Enabled, loginUrl, signUpLocal } = useAuth();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
@@ -51,6 +52,29 @@ function SignupPage() {
 		} catch (error) {
 			setFeedback(error?.message || "Unable to create account.");
 		}
+	}
+
+	function getOAuthProviderUrl(provider) {
+		const marker = "/oauth2/authorization/";
+		if (loginUrl && loginUrl.includes(marker)) {
+			return `${loginUrl.split(marker)[0]}${marker}${provider}`;
+		}
+
+		const authBaseUrl = (import.meta.env.VITE_AUTH_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
+		return `${authBaseUrl}${marker}${provider}`;
+	}
+
+	function handleOAuthSignIn(provider) {
+		if (!oauth2Enabled) {
+			setFeedback("");
+			return;
+		}
+		const targetUrl = getOAuthProviderUrl(provider);
+		if (!targetUrl) {
+			setFeedback("Login URL is not configured.");
+			return;
+		}
+		window.location.assign(targetUrl);
 	}
 
 	if (oauth2Enabled) {
@@ -203,6 +227,42 @@ function SignupPage() {
 									Login
 								</Link>
 							</p>
+
+							<div className="pt-1">
+								<p className="mb-2 text-center text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Or login with</p>
+								<div className="grid grid-cols-3 gap-3">
+									<button
+										type="button"
+										onClick={() => handleOAuthSignIn("google")}
+										className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+										aria-label="Login with Google"
+										title="Login with Google"
+									>
+										<FcGoogle className="h-5 w-5" />
+										Google
+									</button>
+									<button
+										type="button"
+										onClick={() => handleOAuthSignIn("facebook")}
+										className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+										aria-label="Login with Facebook"
+										title="Login with Facebook"
+									>
+										<FaFacebookF className="h-5 w-5" />
+										Facebook
+									</button>
+									<button
+										type="button"
+										onClick={() => handleOAuthSignIn("apple")}
+										className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+										aria-label="Login with Apple"
+										title="Login with Apple"
+									>
+										<FaApple className="h-5 w-5" />
+										Apple
+									</button>
+								</div>
+							</div>
 						</form>
 
 						{feedback && (
