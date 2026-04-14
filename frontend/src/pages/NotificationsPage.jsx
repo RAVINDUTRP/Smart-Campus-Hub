@@ -1,10 +1,62 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import {
 	fetchNotifications,
 	fetchNotificationSummary,
 	markNotificationAsRead
 } from "../features/notifications/notificationApi";
+
+const smoothEase = [0.22, 1, 0.36, 1];
+
+const containerVariants = {
+	hidden: { opacity: 0, y: 14 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.65,
+			ease: smoothEase,
+			staggerChildren: 0.12
+		}
+	}
+};
+
+const sectionVariants = {
+	hidden: { opacity: 0, y: 12 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.62,
+			ease: smoothEase
+		}
+	}
+};
+
+const listVariants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.08,
+			delayChildren: 0.06
+		}
+	}
+};
+
+const itemVariants = {
+	hidden: { opacity: 0, y: 10 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.48,
+			ease: smoothEase
+		}
+	},
+	exit: { opacity: 0, y: -8, transition: { duration: 0.25, ease: "easeOut" } }
+};
 
 function formatTimestamp(value) {
 	if (!value) {
@@ -94,10 +146,10 @@ function NotificationsPage() {
 	const loadedReadCount = notifications.filter((notification) => notification.read).length;
 
 	return (
-		<section className="grid gap-4">
+		<motion.section className="grid gap-4" variants={containerVariants} initial="hidden" animate="visible">
 
 			{/* ── HEADER (redesigned) ───────────────────────────────────────── */}
-			<header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 p-7 shadow-2xl">
+			<motion.header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 p-7 shadow-2xl" variants={sectionVariants}>
 				{/* Decorative blobs */}
 				<div className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
 				<div className="pointer-events-none absolute -bottom-10 right-0 h-48 w-48 rounded-full bg-indigo-400/15 blur-2xl" />
@@ -132,10 +184,10 @@ function NotificationsPage() {
 						</span>
 					</div>
 				</div>
-			</header>
+			</motion.header>
 
 			{/* ── CONTROL PANEL (redesigned) ────────────────────────────────── */}
-			<article className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm ring-1 ring-black/[0.04]">
+			<motion.article className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm ring-1 ring-black/[0.04]" variants={sectionVariants}>
 				{/* Top gradient stripe */}
 				<div className="h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
 
@@ -223,17 +275,24 @@ function NotificationsPage() {
 					</p>
 
 					{/* Feedback banner */}
-					{feedback.text && (
-						<p
-							className={`mt-4 flex items-center gap-2 rounded-2xl border px-4 py-3 text-[0.88rem] font-semibold ${
-								feedback.type === "error"
-									? "border-red-100 bg-red-50 text-red-600"
-									: "border-emerald-100 bg-emerald-50 text-emerald-700"
-							}`}
-						>
-							{feedback.type === "error" ? "⚠️" : "✅"} {feedback.text}
-						</p>
-					)}
+					<AnimatePresence mode="wait">
+						{feedback.text && (
+							<motion.p
+								key={`${feedback.type}-${feedback.text}`}
+								initial={{ opacity: 0, y: 8 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -8 }}
+								transition={{ duration: 0.35, ease: smoothEase }}
+								className={`mt-4 flex items-center gap-2 rounded-2xl border px-4 py-3 text-[0.88rem] font-semibold ${
+									feedback.type === "error"
+										? "border-red-100 bg-red-50 text-red-600"
+										: "border-emerald-100 bg-emerald-50 text-emerald-700"
+								}`}
+							>
+								{feedback.type === "error" ? "⚠️" : "✅"} {feedback.text}
+							</motion.p>
+						)}
+					</AnimatePresence>
 				</div>
 
 				{/* Stat cards — separated by hairline grid */}
@@ -257,10 +316,10 @@ function NotificationsPage() {
 						</div>
 					</div>
 				</div>
-			</article>
+			</motion.article>
 
 			{/* ── NOTIFICATIONS LIST (unchanged) ───────────────────────────── */}
-			<article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+			<motion.article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" variants={sectionVariants}>
 				<div className="mb-3 flex justify-end">
 					<span
 						className={`inline-flex items-center rounded-full px-3 py-1 text-[0.78rem] font-semibold ${
@@ -272,11 +331,11 @@ function NotificationsPage() {
 				</div>
 
 				{isLoading ? (
-					<div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+					<motion.div className="rounded-xl border border-slate-200 bg-slate-50 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
 						<p className="m-0 text-slate-600">Loading notifications...</p>
-					</div>
+					</motion.div>
 				) : notifications.length === 0 ? (
-					<div className="rounded-2xl border border-dashed border-slate-300 bg-gradient-to-b from-white to-slate-50 p-6 text-center">
+					<motion.div className="rounded-2xl border border-dashed border-slate-300 bg-gradient-to-b from-white to-slate-50 p-6 text-center" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: smoothEase }}>
 						<p className="m-0 mb-1 text-2xl">🔔</p>
 						<p className="m-0 mb-1 text-[1.25rem] font-bold text-slate-700">
 							No notifications found
@@ -284,12 +343,18 @@ function NotificationsPage() {
 						<p className="m-0 text-slate-500">
 							Trigger a booking or ticket update, then click Load Notifications.
 						</p>
-					</div>
+					</motion.div>
 				) : (
-					<ul className="grid gap-3">
-						{notifications.map((notification) => (
-							<li
+						<motion.ul className="grid gap-3" variants={listVariants} initial="hidden" animate="visible">
+							<AnimatePresence initial={false}>
+								{notifications.map((notification) => (
+									<motion.li
 								key={notification.id}
+									layout
+									variants={itemVariants}
+									initial="hidden"
+									animate="visible"
+									exit="exit"
 								className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm ${
 									notification.read
 										? "border-slate-200 bg-slate-50"
@@ -329,12 +394,13 @@ function NotificationsPage() {
 										Mark Read
 									</button>
 								)}
-							</li>
-						))}
-					</ul>
+									</motion.li>
+								))}
+							</AnimatePresence>
+						</motion.ul>
 				)}
-			</article>
-		</section>
+			</motion.article>
+		</motion.section>
 	);
 }
 
