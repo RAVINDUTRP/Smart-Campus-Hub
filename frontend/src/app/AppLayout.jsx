@@ -35,15 +35,14 @@ function AppLayout() {
 
 		setIsSigningOut(true);
 		try {
+			await signOutLocal({ skipRefresh: true });
 			if (oauth2Enabled) {
-				await signOutLocal({ skipRefresh: true });
-				window.location.assign(logoutUrl);
+				window.location.replace(logoutUrl);
 				return;
 			}
-			await signOutLocal();
-			window.location.assign("/login");
+			window.location.replace("/login");
 		} catch (_error) {
-			window.location.assign("/login");
+			window.location.replace("/login");
 		}
 	}
 
