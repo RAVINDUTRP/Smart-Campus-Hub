@@ -16,6 +16,12 @@ export function getDefaultLogoutUrl() {
 	return `${getNormalizedAuthBaseUrl()}/logout`;
 }
 
+export function buildOAuthFlowUrl(provider = "google", flow = "login") {
+	const normalizedProvider = String(provider || "google").trim().toLowerCase();
+	const normalizedFlow = String(flow || "login").trim().toLowerCase();
+	return `${getNormalizedAuthBaseUrl()}/api/v1/auth/oauth2/${normalizedProvider}/${normalizedFlow}`;
+}
+
 export function getLocalAuthProfile() {
 	if (typeof window === "undefined") {
 		return null;
