@@ -93,11 +93,35 @@ function getTypeLabel(type) {
 	return type.replaceAll("_", " ");
 }
 
+function getTypeGroup(type) {
+	if (!type) {
+		return "OTHER";
+	}
+
+	if (type.startsWith("BOOKING")) {
+		return "BOOKING";
+	}
+
+	if (type.startsWith("TICKET")) {
+		return "TICKET";
+	}
+
+	return "OTHER";
+}
+
+const typeFilterOptions = [
+	{ value: "ALL", label: "All", tone: "slate" },
+	{ value: "BOOKING", label: "Bookings", tone: "blue" },
+	{ value: "TICKET", label: "Tickets", tone: "amber" },
+	{ value: "OTHER", label: "Other", tone: "indigo" }
+];
+
 function NotificationsPage() {
 	const { profile } = useAuth();
 	const [recipientEmail, setRecipientEmail] = useState("");
 	const [notifications, setNotifications] = useState([]);
 	const [unreadOnly, setUnreadOnly] = useState(false);
+	const [typeFilter, setTypeFilter] = useState("ALL");
 	const [unreadCount, setUnreadCount] = useState(0);
 	const [feedback, setFeedback] = useState({ type: "", text: "" });
 	const [isLoading, setIsLoading] = useState(false);
@@ -173,6 +197,22 @@ function NotificationsPage() {
 		setUnreadOnly(checked);
 		await loadNotifications({ unreadOnly: checked });
 	}
+
+	const filteredNotifications = notifications.filter((notification) => {
+		if (typeFilter === "ALL") {
+			return true;
+		}
+		return getTypeGroup(notification.type) === typeFilter;
+	});
+
+	const typeCounts = notifications.reduce(
+		(accumulator, notification) => {
+			const group = getTypeGroup(notification.type);
+			accumulator[group] = (accumulator[group] || 0) + 1;
+			return accumulator;
+		},
+		{ ALL: notifications.length, BOOKING: 0, TICKET: 0, OTHER: 0 }
+	);
 
 	const loadedReadCount = notifications.filter((notification) => notification.read).length;
 
@@ -305,6 +345,51 @@ function NotificationsPage() {
 						Use your account email to fetch personal updates.
 					</p>
 
+					<div className="mt-4">
+						<p className="mb-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-slate-400">
+							Type filter
+						</p>
+						<div className="w-full rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-1.5 shadow-sm">
+							<div className="grid grid-cols-2 gap-1 md:grid-cols-4">
+							{typeFilterOptions.map((option) => {
+								const isActive = typeFilter === option.value;
+								const count = typeCounts[option.value] || 0;
+								return (
+									<button
+										key={option.value}
+										type="button"
+										onClick={() => setTypeFilter(option.value)}
+										aria-pressed={isActive}
+										className={`inline-flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-[0.88rem] font-semibold transition-all duration-200 ${
+											isActive
+												? "border-indigo-200 bg-white text-indigo-700 shadow-[0_6px_16px_rgba(99,102,241,0.18)]"
+												: "border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:bg-white"
+										}`}
+									>
+										<span className="inline-flex items-center gap-2">
+											<span
+												className={`h-2.5 w-2.5 rounded-full ${
+													option.tone === "blue"
+														? "bg-blue-500"
+														: option.tone === "amber"
+															? "bg-amber-500"
+															: option.tone === "indigo"
+																? "bg-indigo-500"
+																: "bg-slate-500"
+												}`}
+											/>
+											<span className="whitespace-nowrap">{option.label}</span>
+										</span>
+										<span className={`min-w-7 rounded-full px-2 py-0.5 text-center text-[0.72rem] font-bold ${isActive ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-600"}`}>
+											{count}
+										</span>
+									</button>
+								);
+							})}
+							</div>
+						</div>
+					</div>
+
 					{/* Feedback banner */}
 					<AnimatePresence mode="wait">
 						{feedback.text && (
@@ -351,13 +436,15 @@ function NotificationsPage() {
 
 			{/* ── NOTIFICATIONS LIST (unchanged) ───────────────────────────── */}
 			<motion.article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" variants={sectionVariants}>
-				<div className="mb-3 flex justify-end">
-					<span
-						className={`inline-flex items-center rounded-full px-3 py-1 text-[0.78rem] font-semibold ${
-							unreadOnly ? "bg-blue-100 text-blue-800" : "bg-slate-200 text-slate-700"
-						}`}
-					>
-						{unreadOnly ? "Unread filter on" : "All notifications"}
+				<div className="mb-3 flex flex-wrap items-center justify-end gap-2">
+					<span className={`inline-flex items-center rounded-full px-3 py-1 text-[0.78rem] font-semibold ${unreadOnly ? "bg-blue-100 text-blue-800" : "bg-slate-200 text-slate-700"}`}>
+						{unreadOnly ? "Unread only" : "All read states"}
+					</span>
+					<span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-[0.78rem] font-semibold text-indigo-800">
+						Type: {typeFilterOptions.find((option) => option.value === typeFilter)?.label}
+					</span>
+					<span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[0.78rem] font-semibold text-slate-700">
+						Showing {filteredNotifications.length}
 					</span>
 				</div>
 
@@ -365,20 +452,20 @@ function NotificationsPage() {
 					<motion.div className="rounded-xl border border-slate-200 bg-slate-50 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
 						<p className="m-0 text-slate-600">Loading notifications...</p>
 					</motion.div>
-				) : notifications.length === 0 ? (
+				) : filteredNotifications.length === 0 ? (
 					<motion.div className="rounded-2xl border border-dashed border-slate-300 bg-gradient-to-b from-white to-slate-50 p-6 text-center" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: smoothEase }}>
 						<p className="m-0 mb-1 text-2xl">🔔</p>
 						<p className="m-0 mb-1 text-[1.25rem] font-bold text-slate-700">
-							No notifications found
+							No matching notifications
 						</p>
 						<p className="m-0 text-slate-500">
-							Trigger a booking or ticket update, then click Load Notifications.
+							Try another type filter or trigger a new booking/ticket update.
 						</p>
 					</motion.div>
 				) : (
 						<motion.ul className="grid gap-3" variants={listVariants} initial="hidden" animate="visible">
 							<AnimatePresence initial={false}>
-								{notifications.map((notification) => (
+								{filteredNotifications.map((notification) => (
 									<motion.li
 								key={notification.id}
 									layout
