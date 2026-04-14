@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -116,6 +116,8 @@ const typeFilterOptions = [
 	{ value: "OTHER", label: "Other", tone: "indigo" }
 ];
 
+const INITIAL_VISIBLE_NOTIFICATIONS = 6;
+
 function NotificationsPage() {
 	const { profile } = useAuth();
 	const [recipientEmail, setRecipientEmail] = useState("");
@@ -125,6 +127,7 @@ function NotificationsPage() {
 	const [unreadCount, setUnreadCount] = useState(0);
 	const [feedback, setFeedback] = useState({ type: "", text: "" });
 	const [isLoading, setIsLoading] = useState(false);
+	const [showAllNotifications, setShowAllNotifications] = useState(false);
 
 	useEffect(() => {
 		if (profile?.email) {
@@ -138,6 +141,10 @@ function NotificationsPage() {
 		}
 		loadNotifications({ email: recipientEmail, unreadOnly });
 	}, [recipientEmail]);
+
+	useEffect(() => {
+		setShowAllNotifications(false);
+	}, [recipientEmail, unreadOnly, typeFilter]);
 
 	useEffect(() => {
 		if (!recipientEmail) {
@@ -204,6 +211,19 @@ function NotificationsPage() {
 		}
 		return getTypeGroup(notification.type) === typeFilter;
 	});
+
+	const sortedFilteredNotifications = [...filteredNotifications].sort(
+		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+	);
+
+	const hasMoreThanInitial = sortedFilteredNotifications.length > INITIAL_VISIBLE_NOTIFICATIONS;
+	const visibleNotifications = showAllNotifications
+		? sortedFilteredNotifications
+		: sortedFilteredNotifications.slice(0, INITIAL_VISIBLE_NOTIFICATIONS);
+	const hiddenNotificationsCount = Math.max(
+		sortedFilteredNotifications.length - visibleNotifications.length,
+		0
+	);
 
 	const typeCounts = notifications.reduce(
 		(accumulator, notification) => {
@@ -444,15 +464,19 @@ function NotificationsPage() {
 						Type: {typeFilterOptions.find((option) => option.value === typeFilter)?.label}
 					</span>
 					<span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[0.78rem] font-semibold text-slate-700">
-						Showing {filteredNotifications.length}
+						Showing {visibleNotifications.length}/{sortedFilteredNotifications.length}
 					</span>
 				</div>
+
+				<p className="mb-3 text-[0.78rem] font-semibold text-slate-500">
+					Sorted by newest first
+				</p>
 
 				{isLoading ? (
 					<motion.div className="rounded-xl border border-slate-200 bg-slate-50 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
 						<p className="m-0 text-slate-600">Loading notifications...</p>
 					</motion.div>
-				) : filteredNotifications.length === 0 ? (
+				) : sortedFilteredNotifications.length === 0 ? (
 					<motion.div className="rounded-2xl border border-dashed border-slate-300 bg-gradient-to-b from-white to-slate-50 p-6 text-center" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: smoothEase }}>
 						<p className="m-0 mb-1 text-2xl">🔔</p>
 						<p className="m-0 mb-1 text-[1.25rem] font-bold text-slate-700">
@@ -463,59 +487,103 @@ function NotificationsPage() {
 						</p>
 					</motion.div>
 				) : (
+					<>
 						<motion.ul className="grid gap-3" variants={listVariants} initial="hidden" animate="visible">
 							<AnimatePresence initial={false}>
-								{filteredNotifications.map((notification) => (
-									<motion.li
-								key={notification.id}
+								{visibleNotifications.map((notification, index) => (
+									<Fragment key={notification.id}>
+										{index === 1 && (
+											<li className="flex items-center gap-3 px-1 py-1">
+												<span className="h-px flex-1 bg-slate-200" />
+												<span className="rounded-full bg-slate-100 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-slate-500">
+													Earlier
+												</span>
+												<span className="h-px flex-1 bg-slate-200" />
+											</li>
+										)}
+										<motion.li
+										key={`${notification.id}-item`}
 									layout
 									variants={itemVariants}
 									initial="hidden"
 									animate="visible"
 									exit="exit"
-								className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm ${
-									notification.read
-										? "border-slate-200 bg-slate-50"
-										: "border-slate-200 bg-white hover:-translate-y-[1px] hover:shadow-md"
-								}`}
-								style={{ borderLeft: `4px solid ${getAccentColor(notification.type)}` }}
-							>
-								<div className="min-w-0 flex-1">
-									<div className="mb-1.5 flex flex-wrap items-center gap-2">
-										<span
-											className="inline-flex rounded-full px-2 py-1 text-[0.72rem] font-bold uppercase tracking-wide"
-											style={{ background: `${getAccentColor(notification.type)}20`, color: getAccentColor(notification.type) }}
-										>
-											{getTypeLabel(notification.type)}
-										</span>
-									</div>
-									<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-800">
-										{notification.title}
-									</p>
-									<p className="m-0 mb-2 text-slate-600">
-										{notification.message}
-									</p>
-									<p className="m-0 text-[0.85rem] text-slate-500">
-										{notification.type} • {formatTimestamp(notification.createdAt)}
-									</p>
-								</div>
-								{notification.read ? (
-									<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
-										Read
-									</span>
-								) : (
-									<button
-										type="button"
-										className="h-9 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700"
-										onClick={() => handleMarkAsRead(notification.id)}
+										className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm ${
+											notification.read
+												? "border-slate-200 bg-slate-50"
+												: "border-slate-200 bg-white hover:-translate-y-[1px] hover:shadow-md"
+										}`}
+										style={{ borderLeft: `4px solid ${getAccentColor(notification.type)}` }}
 									>
-										Mark Read
-									</button>
-								)}
-									</motion.li>
+										<div className="min-w-0 flex-1">
+											<div className="mb-1.5 flex flex-wrap items-center gap-2">
+												<span
+													className="inline-flex rounded-full px-2 py-1 text-[0.72rem] font-bold uppercase tracking-wide"
+													style={{ background: `${getAccentColor(notification.type)}20`, color: getAccentColor(notification.type) }}
+												>
+													{getTypeLabel(notification.type)}
+												</span>
+												{index === 0 && (
+													<span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-emerald-700">
+														Latest
+													</span>
+												)}
+											</div>
+											<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-800">
+												{notification.title}
+											</p>
+											<p className="m-0 mb-2 text-slate-600">
+												{notification.message}
+											</p>
+											<p className="m-0 text-[0.85rem] text-slate-500">
+												{notification.type} • {formatTimestamp(notification.createdAt)}
+											</p>
+										</div>
+										{notification.read ? (
+											<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
+												Read
+											</span>
+										) : (
+											<button
+												type="button"
+												className="h-9 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700"
+												onClick={() => handleMarkAsRead(notification.id)}
+											>
+												Mark Read
+											</button>
+										)}
+										</motion.li>
+									</Fragment>
 								))}
 							</AnimatePresence>
 						</motion.ul>
+
+						{hasMoreThanInitial && (
+							<div className="mt-4 flex justify-center">
+								<button
+									type="button"
+									onClick={() => setShowAllNotifications((currentValue) => !currentValue)}
+									className="group inline-flex h-11 items-center gap-2 rounded-full border border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50 px-5 text-[0.86rem] font-bold text-indigo-700 transition-all duration-200 hover:-translate-y-[1px] hover:border-indigo-300 hover:shadow-[0_8px_20px_rgba(79,70,229,0.16)]"
+								>
+									{showAllNotifications ? (
+										<>
+											<span>Show less</span>
+											<span className="rounded-full bg-white/80 px-2 py-0.5 text-[0.72rem] font-extrabold text-indigo-700">
+												Back to {INITIAL_VISIBLE_NOTIFICATIONS}
+											</span>
+										</>
+									) : (
+										<>
+											<span>See more notifications</span>
+											<span className="rounded-full bg-white/90 px-2 py-0.5 text-[0.72rem] font-extrabold text-indigo-700">
+												+{hiddenNotificationsCount}
+											</span>
+										</>
+									)}
+								</button>
+							</div>
+						)}
+					</>
 				)}
 			</motion.article>
 		</motion.section>
