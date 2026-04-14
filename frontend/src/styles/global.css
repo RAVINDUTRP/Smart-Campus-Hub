@@ -15,12 +15,17 @@ body {
 }
 
 .app-shell {
-	display: grid;
-	grid-template-columns: 260px 1fr;
+	display: block;
 	min-height: 100vh;
 }
 
 .sidebar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 260px;
+	overflow-y: auto;
 	background: #0f1f3a;
 	color: #f3f7ff;
 	padding: 24px;
@@ -87,16 +92,20 @@ body {
 }
 
 .content {
+	margin-left: 260px;
 	padding: 28px;
 }
 
 @media (max-width: 900px) {
-	.app-shell {
-		grid-template-columns: 1fr;
+	.sidebar {
+		position: static;
+		width: auto;
+		overflow: visible;
+		padding: 16px;
 	}
 
-	.sidebar {
-		padding: 16px;
+	.content {
+		margin-left: 0;
 	}
 
 	.sidebar nav {
