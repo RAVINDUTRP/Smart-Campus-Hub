@@ -108,9 +108,29 @@ function NotificationsPage() {
 		}
 	}, [profile]);
 
+	useEffect(() => {
+		if (!recipientEmail) {
+			return;
+		}
+		loadNotifications({ email: recipientEmail, unreadOnly });
+	}, [recipientEmail]);
+
+	useEffect(() => {
+		if (!recipientEmail) {
+			return;
+		}
+
+		const intervalId = window.setInterval(() => {
+			loadNotifications({ email: recipientEmail, unreadOnly, silent: true });
+		}, 6000);
+
+		return () => window.clearInterval(intervalId);
+	}, [recipientEmail, unreadOnly]);
+
 	async function loadNotifications(options = {}) {
 		const email = options.email ?? recipientEmail;
 		const unreadFilter = options.unreadOnly ?? unreadOnly;
+		const silent = Boolean(options.silent);
 
 		if (!email) {
 			setFeedback({ type: "error", text: "Recipient email is required." });
@@ -118,8 +138,10 @@ function NotificationsPage() {
 		}
 
 		try {
-			setIsLoading(true);
-			setFeedback({ type: "", text: "" });
+			if (!silent) {
+				setIsLoading(true);
+				setFeedback({ type: "", text: "" });
+			}
 			const [list, summary] = await Promise.all([
 				fetchNotifications(email, unreadFilter),
 				fetchNotificationSummary(email)
@@ -127,9 +149,13 @@ function NotificationsPage() {
 			setNotifications(list);
 			setUnreadCount(summary?.unreadCount || 0);
 		} catch (error) {
-			setFeedback({ type: "error", text: getErrorMessage(error) });
+			if (!silent) {
+				setFeedback({ type: "error", text: getErrorMessage(error) });
+			}
 		} finally {
-			setIsLoading(false);
+			if (!silent) {
+				setIsLoading(false);
+			}
 		}
 	}
 
