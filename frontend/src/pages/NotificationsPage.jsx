@@ -143,6 +143,11 @@ function NotificationsPage() {
 		}
 	}
 
+	async function handleUnreadOnlyChange(checked) {
+		setUnreadOnly(checked);
+		await loadNotifications({ unreadOnly: checked });
+	}
+
 	const loadedReadCount = notifications.filter((notification) => notification.read).length;
 
 	return (
@@ -228,7 +233,7 @@ function NotificationsPage() {
 							<input
 								type="checkbox"
 								checked={unreadOnly}
-								onChange={(event) => setUnreadOnly(event.target.checked)}
+								onChange={(event) => handleUnreadOnlyChange(event.target.checked)}
 								className="peer sr-only"
 							/>
 							{/* Animated toggle track */}
