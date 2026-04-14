@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaApple, FaChevronDown, FaEye, FaEyeSlash, FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { Link, Navigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { buildOAuthFlowUrl } from "../features/auth/authApi";
 
 const roleOptions = [
 	{ value: "USER", label: "Student / User" },
@@ -12,8 +14,14 @@ const roleOptions = [
 
 const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
 
+const panelVariants = {
+	hidden: { opacity: 0, y: 24 },
+	visible: { opacity: 1, y: 0 }
+};
+
 function SignupPage() {
-	const { isLoadingProfile, isAuthenticated, loginUrl, signUpLocal } = useAuth();
+	const { isLoadingProfile, isAuthenticated, signUpLocal } = useAuth();
+	const location = useLocation();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,6 +30,16 @@ function SignupPage() {
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [feedback, setFeedback] = useState("");
 	const [isRoleOpen, setIsRoleOpen] = useState(false);
+
+	useEffect(() => {
+		const params = new URLSearchParams(location.search);
+		const oauthEmail = (params.get("email") || "").trim().toLowerCase();
+		if (!oauthEmail) {
+			return;
+		}
+		setEmail(oauthEmail);
+		setFeedback("Google email selected. Set your password and role to complete registration.");
+	}, [location.search]);
 
 	if (isLoadingProfile) {
 		return <p>Checking authentication status...</p>;
@@ -57,13 +75,7 @@ function SignupPage() {
 	}
 
 	function getOAuthProviderUrl(provider) {
-		const marker = "/oauth2/authorization/";
-		if (loginUrl && loginUrl.includes(marker)) {
-			return `${loginUrl.split(marker)[0]}${marker}${provider}`;
-		}
-
-		const authBaseUrl = (import.meta.env.VITE_AUTH_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
-		return `${authBaseUrl}${marker}${provider}`;
+		return buildOAuthFlowUrl(provider, "signup");
 	}
 
 	function handleOAuthSignIn(provider) {
@@ -80,7 +92,12 @@ function SignupPage() {
 	}
 
 	return (
-		<section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
+		<motion.section
+			className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-6 sm:px-6 lg:px-8"
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			transition={{ duration: 0.3, ease: "easeOut" }}
+		>
 			<div
 				className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
 				style={{ backgroundImage: `url('${coverImage}')` }}
@@ -89,8 +106,19 @@ function SignupPage() {
 			<div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl" />
 			<div className="pointer-events-none absolute -bottom-24 -right-16 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl" />
 
-			<div className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-white/30 bg-white/95 shadow-[0_20px_70px_rgba(15,23,42,0.35)] backdrop-blur-sm lg:grid-cols-[1.05fr_1.3fr]">
-				<div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8 text-white sm:p-10">
+			<motion.div
+				className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-white/30 bg-white/95 shadow-[0_20px_70px_rgba(15,23,42,0.35)] backdrop-blur-sm lg:grid-cols-[1.05fr_1.3fr]"
+				initial={{ opacity: 0, scale: 0.985, y: 12 }}
+				animate={{ opacity: 1, scale: 1, y: 0 }}
+				transition={{ duration: 0.35, ease: "easeOut" }}
+			>
+				<motion.div
+					className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8 text-white sm:p-10"
+					variants={panelVariants}
+					initial="hidden"
+					animate="visible"
+					transition={{ duration: 0.35, delay: 0.05, ease: "easeOut" }}
+				>
 					<div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
 						<span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-900/70 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
 							<span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.85)]" />
@@ -111,9 +139,15 @@ function SignupPage() {
 							<span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wide text-blue-100">Operations hub</span>
 						</div>
 					</div>
-				</div>
+				</motion.div>
 
-				<div className="flex items-center p-7 sm:p-8">
+				<motion.div
+					className="flex items-center p-7 sm:p-8"
+					variants={panelVariants}
+					initial="hidden"
+					animate="visible"
+					transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
+				>
 					<div className="mx-auto w-full max-w-lg">
 						<h2 className="m-0 text-2xl font-black tracking-tight text-slate-900">Sign Up</h2>
 						<p className="mt-2 text-sm text-slate-500">Create an account with your role and start using Smart Campus.</p>
@@ -273,15 +307,24 @@ function SignupPage() {
 							</div>
 						</form>
 
-						{feedback && (
-							<p className="mt-4 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600">
-								{feedback}
-							</p>
-						)}
+						<AnimatePresence mode="wait">
+							{feedback && (
+								<motion.p
+									key={feedback}
+									initial={{ opacity: 0, y: 6 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -6 }}
+									transition={{ duration: 0.2, ease: "easeOut" }}
+									className="mt-4 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600"
+								>
+									{feedback}
+								</motion.p>
+							)}
+						</AnimatePresence>
 					</div>
-				</div>
-			</div>
-		</section>
+				</motion.div>
+			</motion.div>
+		</motion.section>
 	);
 }
 
