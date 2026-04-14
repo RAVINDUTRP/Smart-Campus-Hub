@@ -39,6 +39,7 @@ public class AuthController {
 
     private static final String DEFAULT_EMAIL = "student1@smartcampus.local";
     private static final String GUEST_EMAIL = "guest@smartcampus.local";
+    private static final String OAUTH2_FLOW_SESSION_KEY = "oauth2_flow";
 
     private final boolean oauth2Enabled;
     private final String oauth2RegistrationId;
@@ -83,6 +84,27 @@ public class AuthController {
         return ResponseEntity.ok(new AuthRoleResponse(role));
     }
 
+    @GetMapping("/oauth2/{provider}/{flow}")
+    public void beginOAuthFlow(
+            @org.springframework.web.bind.annotation.PathVariable("provider") String provider,
+            @org.springframework.web.bind.annotation.PathVariable("flow") String flow,
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response
+    ) throws java.io.IOException {
+        String normalizedProvider = provider == null ? "" : provider.trim().toLowerCase(Locale.ROOT);
+        String normalizedFlow = flow == null ? "" : flow.trim().toLowerCase(Locale.ROOT);
+
+        if (normalizedProvider.isBlank()) {
+            throw new IllegalArgumentException("OAuth2 provider is required.");
+        }
+        if (!"login".equals(normalizedFlow) && !"signup".equals(normalizedFlow)) {
+            throw new IllegalArgumentException("Unsupported OAuth2 flow. Use login or signup.");
+        }
+
+        request.getSession(true).setAttribute(OAUTH2_FLOW_SESSION_KEY, normalizedFlow);
+        response.sendRedirect("/oauth2/authorization/" + normalizedProvider + "?prompt=select_account");
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getCurrentUser(
             @RequestHeader(value = "X-User-Email", required = false) String headerEmail,
@@ -113,9 +135,10 @@ public class AuthController {
                 }
                 if (authorityName.startsWith("ROLE_")) {
                     roleSet.add(authorityName.substring(5));
-                } else {
-                    roleSet.add(authorityName);
                 }
+            }
+            if (roleSet.isEmpty() && localUser.isPresent()) {
+                roleSet.addAll(credentialAuthService.resolveRoleHierarchy(localUser.get().getRole()));
             }
         } else if (localUser.isPresent()) {
             roleSet.addAll(credentialAuthService.resolveRoleHierarchy(localUser.get().getRole()));
