@@ -14,7 +14,7 @@ const roleOptions = [
 const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
 
 function SignupPage() {
-	const { isLoadingProfile, oauth2Enabled, isAuthenticated, signUpLocal } = useAuth();
+	const { oauth2Enabled, isAuthenticated, signUpLocal } = useAuth();
 	const location = useLocation();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -34,10 +34,6 @@ function SignupPage() {
 		setEmail(oauthEmail);
 		setFeedback("Google email selected. Set your password and role to complete registration.");
 	}, [location.search]);
-
-	if (isLoadingProfile) {
-		return <p>Checking authentication status...</p>;
-	}
 
 	if (isAuthenticated) {
 		return <Navigate to="/" replace />;

@@ -20,7 +20,7 @@ const roleLabels = {
 const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
 
 function LoginPage() {
-	const { isLoadingProfile, oauth2Enabled, isAuthenticated, signInLocal, signInDemo, profile } = useAuth();
+	const { oauth2Enabled, isAuthenticated, signInLocal, signInDemo, profile } = useAuth();
 	const location = useLocation();
 	const [email, setEmail] = useState(profile?.email && profile.email !== "guest@smartcampus.local" ? profile.email : "");
 	const [password, setPassword] = useState("");
@@ -75,10 +75,6 @@ function LoginPage() {
 			clearTimeout(timer);
 		};
 	}, [email, oauth2Enabled]);
-
-	if (isLoadingProfile) {
-		return <p>Checking authentication status...</p>;
-	}
 
 	if (isAuthenticated) {
 		return <Navigate to="/" replace />;
