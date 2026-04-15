@@ -14,7 +14,7 @@ const roleOptions = [
 const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
 
 function SignupPage() {
-	const { isLoadingProfile, isAuthenticated, signUpLocal } = useAuth();
+	const { isLoadingProfile, oauth2Enabled, isAuthenticated, signUpLocal } = useAuth();
 	const location = useLocation();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -242,41 +242,47 @@ function SignupPage() {
 								</Link>
 							</p>
 
-							<div className="pt-1">
-								<p className="mb-2 text-center text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Or login with</p>
-								<div className="grid grid-cols-3 gap-3">
-									<button
-										type="button"
-										onClick={() => handleOAuthSignIn("google")}
-										className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
-										aria-label="Login with Google"
-										title="Login with Google"
-									>
-										<FcGoogle className="h-5 w-5" />
-										Google
-									</button>
-									<button
-										type="button"
-										onClick={() => handleComingSoonProvider("Facebook")}
-										className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
-										aria-label="Login with Facebook"
-										title="Login with Facebook"
-									>
-										<FaFacebookF className="h-5 w-5" />
-										Facebook
-									</button>
-									<button
-										type="button"
-										onClick={() => handleComingSoonProvider("Apple")}
-										className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
-										aria-label="Login with Apple"
-										title="Login with Apple"
-									>
-										<FaApple className="h-5 w-5" />
-										Apple
-									</button>
+							{oauth2Enabled ? (
+								<div className="pt-1">
+									<p className="mb-2 text-center text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Or login with</p>
+									<div className="grid grid-cols-3 gap-3">
+										<button
+											type="button"
+											onClick={() => handleOAuthSignIn("google")}
+											className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+											aria-label="Login with Google"
+											title="Login with Google"
+										>
+											<FcGoogle className="h-5 w-5" />
+											Google
+										</button>
+										<button
+											type="button"
+											onClick={() => handleComingSoonProvider("Facebook")}
+											className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+											aria-label="Login with Facebook"
+											title="Login with Facebook"
+										>
+											<FaFacebookF className="h-5 w-5" />
+											Facebook
+										</button>
+										<button
+											type="button"
+											onClick={() => handleComingSoonProvider("Apple")}
+											className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-[0.9rem] font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
+											aria-label="Login with Apple"
+											title="Login with Apple"
+										>
+											<FaApple className="h-5 w-5" />
+											Apple
+										</button>
+									</div>
 								</div>
-							</div>
+							) : (
+								<p className="mb-0 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-center text-sm font-semibold text-amber-700">
+									Google login is not configured in this environment. Use email and password signup.
+								</p>
+							)}
 						</form>
 
 						{feedback && (
