@@ -1,10 +1,62 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import {
 	fetchNotifications,
 	fetchNotificationSummary,
 	markNotificationAsRead
 } from "../features/notifications/notificationApi";
+
+const smoothEase = [0.22, 1, 0.36, 1];
+
+const containerVariants = {
+	hidden: { opacity: 0, y: 14 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.65,
+			ease: smoothEase,
+			staggerChildren: 0.12
+		}
+	}
+};
+
+const sectionVariants = {
+	hidden: { opacity: 0, y: 12 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.62,
+			ease: smoothEase
+		}
+	}
+};
+
+const listVariants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.08,
+			delayChildren: 0.06
+		}
+	}
+};
+
+const itemVariants = {
+	hidden: { opacity: 0, y: 10 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.48,
+			ease: smoothEase
+		}
+	},
+	exit: { opacity: 0, y: -8, transition: { duration: 0.25, ease: "easeOut" } }
+};
 
 function formatTimestamp(value) {
 	if (!value) {
@@ -41,14 +93,41 @@ function getTypeLabel(type) {
 	return type.replaceAll("_", " ");
 }
 
+function getTypeGroup(type) {
+	if (!type) {
+		return "OTHER";
+	}
+
+	if (type.startsWith("BOOKING")) {
+		return "BOOKING";
+	}
+
+	if (type.startsWith("TICKET")) {
+		return "TICKET";
+	}
+
+	return "OTHER";
+}
+
+const typeFilterOptions = [
+	{ value: "ALL", label: "All", tone: "slate" },
+	{ value: "BOOKING", label: "Bookings", tone: "blue" },
+	{ value: "TICKET", label: "Tickets", tone: "amber" },
+	{ value: "OTHER", label: "Other", tone: "indigo" }
+];
+
+const INITIAL_VISIBLE_NOTIFICATIONS = 6;
+
 function NotificationsPage() {
 	const { profile } = useAuth();
 	const [recipientEmail, setRecipientEmail] = useState("");
 	const [notifications, setNotifications] = useState([]);
 	const [unreadOnly, setUnreadOnly] = useState(false);
+	const [typeFilter, setTypeFilter] = useState("ALL");
 	const [unreadCount, setUnreadCount] = useState(0);
 	const [feedback, setFeedback] = useState({ type: "", text: "" });
 	const [isLoading, setIsLoading] = useState(false);
+	const [showAllNotifications, setShowAllNotifications] = useState(false);
 
 	useEffect(() => {
 		if (profile?.email) {
@@ -56,9 +135,33 @@ function NotificationsPage() {
 		}
 	}, [profile]);
 
+	useEffect(() => {
+		if (!recipientEmail) {
+			return;
+		}
+		loadNotifications({ email: recipientEmail, unreadOnly });
+	}, [recipientEmail]);
+
+	useEffect(() => {
+		setShowAllNotifications(false);
+	}, [recipientEmail, unreadOnly, typeFilter]);
+
+	useEffect(() => {
+		if (!recipientEmail) {
+			return;
+		}
+
+		const intervalId = window.setInterval(() => {
+			loadNotifications({ email: recipientEmail, unreadOnly, silent: true });
+		}, 6000);
+
+		return () => window.clearInterval(intervalId);
+	}, [recipientEmail, unreadOnly]);
+
 	async function loadNotifications(options = {}) {
 		const email = options.email ?? recipientEmail;
 		const unreadFilter = options.unreadOnly ?? unreadOnly;
+		const silent = Boolean(options.silent);
 
 		if (!email) {
 			setFeedback({ type: "error", text: "Recipient email is required." });
@@ -66,8 +169,10 @@ function NotificationsPage() {
 		}
 
 		try {
-			setIsLoading(true);
-			setFeedback({ type: "", text: "" });
+			if (!silent) {
+				setIsLoading(true);
+				setFeedback({ type: "", text: "" });
+			}
 			const [list, summary] = await Promise.all([
 				fetchNotifications(email, unreadFilter),
 				fetchNotificationSummary(email)
@@ -75,9 +180,13 @@ function NotificationsPage() {
 			setNotifications(list);
 			setUnreadCount(summary?.unreadCount || 0);
 		} catch (error) {
-			setFeedback({ type: "error", text: getErrorMessage(error) });
+			if (!silent) {
+				setFeedback({ type: "error", text: getErrorMessage(error) });
+			}
 		} finally {
-			setIsLoading(false);
+			if (!silent) {
+				setIsLoading(false);
+			}
 		}
 	}
 
@@ -91,13 +200,47 @@ function NotificationsPage() {
 		}
 	}
 
+	async function handleUnreadOnlyChange(checked) {
+		setUnreadOnly(checked);
+		await loadNotifications({ unreadOnly: checked });
+	}
+
+	const filteredNotifications = notifications.filter((notification) => {
+		if (typeFilter === "ALL") {
+			return true;
+		}
+		return getTypeGroup(notification.type) === typeFilter;
+	});
+
+	const sortedFilteredNotifications = [...filteredNotifications].sort(
+		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+	);
+
+	const hasMoreThanInitial = sortedFilteredNotifications.length > INITIAL_VISIBLE_NOTIFICATIONS;
+	const visibleNotifications = showAllNotifications
+		? sortedFilteredNotifications
+		: sortedFilteredNotifications.slice(0, INITIAL_VISIBLE_NOTIFICATIONS);
+	const hiddenNotificationsCount = Math.max(
+		sortedFilteredNotifications.length - visibleNotifications.length,
+		0
+	);
+
+	const typeCounts = notifications.reduce(
+		(accumulator, notification) => {
+			const group = getTypeGroup(notification.type);
+			accumulator[group] = (accumulator[group] || 0) + 1;
+			return accumulator;
+		},
+		{ ALL: notifications.length, BOOKING: 0, TICKET: 0, OTHER: 0 }
+	);
+
 	const loadedReadCount = notifications.filter((notification) => notification.read).length;
 
 	return (
-		<section className="grid gap-4">
+		<motion.section className="grid gap-4" variants={containerVariants} initial="hidden" animate="visible">
 
 			{/* ── HEADER (redesigned) ───────────────────────────────────────── */}
-			<header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 p-7 shadow-2xl">
+			<motion.header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 p-7 shadow-2xl" variants={sectionVariants}>
 				{/* Decorative blobs */}
 				<div className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
 				<div className="pointer-events-none absolute -bottom-10 right-0 h-48 w-48 rounded-full bg-indigo-400/15 blur-2xl" />
@@ -132,10 +275,10 @@ function NotificationsPage() {
 						</span>
 					</div>
 				</div>
-			</header>
+			</motion.header>
 
 			{/* ── CONTROL PANEL (redesigned) ────────────────────────────────── */}
-			<article className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm ring-1 ring-black/[0.04]">
+			<motion.article className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm ring-1 ring-black/[0.04]" variants={sectionVariants}>
 				{/* Top gradient stripe */}
 				<div className="h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
 
@@ -176,7 +319,7 @@ function NotificationsPage() {
 							<input
 								type="checkbox"
 								checked={unreadOnly}
-								onChange={(event) => setUnreadOnly(event.target.checked)}
+								onChange={(event) => handleUnreadOnlyChange(event.target.checked)}
 								className="peer sr-only"
 							/>
 							{/* Animated toggle track */}
@@ -222,18 +365,70 @@ function NotificationsPage() {
 						Use your account email to fetch personal updates.
 					</p>
 
-					{/* Feedback banner */}
-					{feedback.text && (
-						<p
-							className={`mt-4 flex items-center gap-2 rounded-2xl border px-4 py-3 text-[0.88rem] font-semibold ${
-								feedback.type === "error"
-									? "border-red-100 bg-red-50 text-red-600"
-									: "border-emerald-100 bg-emerald-50 text-emerald-700"
-							}`}
-						>
-							{feedback.type === "error" ? "⚠️" : "✅"} {feedback.text}
+					<div className="mt-4">
+						<p className="mb-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-slate-400">
+							Type filter
 						</p>
-					)}
+						<div className="w-full rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-1.5 shadow-sm">
+							<div className="grid grid-cols-2 gap-1 md:grid-cols-4">
+							{typeFilterOptions.map((option) => {
+								const isActive = typeFilter === option.value;
+								const count = typeCounts[option.value] || 0;
+								return (
+									<button
+										key={option.value}
+										type="button"
+										onClick={() => setTypeFilter(option.value)}
+										aria-pressed={isActive}
+										className={`inline-flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-[0.88rem] font-semibold transition-all duration-200 ${
+											isActive
+												? "border-indigo-200 bg-white text-indigo-700 shadow-[0_6px_16px_rgba(99,102,241,0.18)]"
+												: "border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:bg-white"
+										}`}
+									>
+										<span className="inline-flex items-center gap-2">
+											<span
+												className={`h-2.5 w-2.5 rounded-full ${
+													option.tone === "blue"
+														? "bg-blue-500"
+														: option.tone === "amber"
+															? "bg-amber-500"
+															: option.tone === "indigo"
+																? "bg-indigo-500"
+																: "bg-slate-500"
+												}`}
+											/>
+											<span className="whitespace-nowrap">{option.label}</span>
+										</span>
+										<span className={`min-w-7 rounded-full px-2 py-0.5 text-center text-[0.72rem] font-bold ${isActive ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-600"}`}>
+											{count}
+										</span>
+									</button>
+								);
+							})}
+							</div>
+						</div>
+					</div>
+
+					{/* Feedback banner */}
+					<AnimatePresence mode="wait">
+						{feedback.text && (
+							<motion.p
+								key={`${feedback.type}-${feedback.text}`}
+								initial={{ opacity: 0, y: 8 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -8 }}
+								transition={{ duration: 0.35, ease: smoothEase }}
+								className={`mt-4 flex items-center gap-2 rounded-2xl border px-4 py-3 text-[0.88rem] font-semibold ${
+									feedback.type === "error"
+										? "border-red-100 bg-red-50 text-red-600"
+										: "border-emerald-100 bg-emerald-50 text-emerald-700"
+								}`}
+							>
+								{feedback.type === "error" ? "⚠️" : "✅"} {feedback.text}
+							</motion.p>
+						)}
+					</AnimatePresence>
 				</div>
 
 				{/* Stat cards — separated by hairline grid */}
@@ -257,84 +452,141 @@ function NotificationsPage() {
 						</div>
 					</div>
 				</div>
-			</article>
+			</motion.article>
 
 			{/* ── NOTIFICATIONS LIST (unchanged) ───────────────────────────── */}
-			<article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-				<div className="mb-3 flex justify-end">
-					<span
-						className={`inline-flex items-center rounded-full px-3 py-1 text-[0.78rem] font-semibold ${
-							unreadOnly ? "bg-blue-100 text-blue-800" : "bg-slate-200 text-slate-700"
-						}`}
-					>
-						{unreadOnly ? "Unread filter on" : "All notifications"}
+			<motion.article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" variants={sectionVariants}>
+				<div className="mb-3 flex flex-wrap items-center justify-end gap-2">
+					<span className={`inline-flex items-center rounded-full px-3 py-1 text-[0.78rem] font-semibold ${unreadOnly ? "bg-blue-100 text-blue-800" : "bg-slate-200 text-slate-700"}`}>
+						{unreadOnly ? "Unread only" : "All read states"}
+					</span>
+					<span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-[0.78rem] font-semibold text-indigo-800">
+						Type: {typeFilterOptions.find((option) => option.value === typeFilter)?.label}
+					</span>
+					<span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[0.78rem] font-semibold text-slate-700">
+						Showing {visibleNotifications.length}/{sortedFilteredNotifications.length}
 					</span>
 				</div>
 
+				<p className="mb-3 text-[0.78rem] font-semibold text-slate-500">
+					Sorted by newest first
+				</p>
+
 				{isLoading ? (
-					<div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+					<motion.div className="rounded-xl border border-slate-200 bg-slate-50 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
 						<p className="m-0 text-slate-600">Loading notifications...</p>
-					</div>
-				) : notifications.length === 0 ? (
-					<div className="rounded-2xl border border-dashed border-slate-300 bg-gradient-to-b from-white to-slate-50 p-6 text-center">
+					</motion.div>
+				) : sortedFilteredNotifications.length === 0 ? (
+					<motion.div className="rounded-2xl border border-dashed border-slate-300 bg-gradient-to-b from-white to-slate-50 p-6 text-center" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: smoothEase }}>
 						<p className="m-0 mb-1 text-2xl">🔔</p>
 						<p className="m-0 mb-1 text-[1.25rem] font-bold text-slate-700">
-							No notifications found
+							No matching notifications
 						</p>
 						<p className="m-0 text-slate-500">
-							Trigger a booking or ticket update, then click Load Notifications.
+							Try another type filter or trigger a new booking/ticket update.
 						</p>
-					</div>
+					</motion.div>
 				) : (
-					<ul className="grid gap-3">
-						{notifications.map((notification) => (
-							<li
-								key={notification.id}
-								className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm ${
-									notification.read
-										? "border-slate-200 bg-slate-50"
-										: "border-slate-200 bg-white hover:-translate-y-[1px] hover:shadow-md"
-								}`}
-								style={{ borderLeft: `4px solid ${getAccentColor(notification.type)}` }}
-							>
-								<div className="min-w-0 flex-1">
-									<div className="mb-1.5 flex flex-wrap items-center gap-2">
-										<span
-											className="inline-flex rounded-full px-2 py-1 text-[0.72rem] font-bold uppercase tracking-wide"
-											style={{ background: `${getAccentColor(notification.type)}20`, color: getAccentColor(notification.type) }}
-										>
-											{getTypeLabel(notification.type)}
-										</span>
-									</div>
-									<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-800">
-										{notification.title}
-									</p>
-									<p className="m-0 mb-2 text-slate-600">
-										{notification.message}
-									</p>
-									<p className="m-0 text-[0.85rem] text-slate-500">
-										{notification.type} • {formatTimestamp(notification.createdAt)}
-									</p>
-								</div>
-								{notification.read ? (
-									<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
-										Read
-									</span>
-								) : (
-									<button
-										type="button"
-										className="h-9 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700"
-										onClick={() => handleMarkAsRead(notification.id)}
+					<>
+						<motion.ul className="grid gap-3" variants={listVariants} initial="hidden" animate="visible">
+							<AnimatePresence initial={false}>
+								{visibleNotifications.map((notification, index) => (
+									<Fragment key={notification.id}>
+										{index === 1 && (
+											<li className="flex items-center gap-3 px-1 py-1">
+												<span className="h-px flex-1 bg-slate-200" />
+												<span className="rounded-full bg-slate-100 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-slate-500">
+													Earlier
+												</span>
+												<span className="h-px flex-1 bg-slate-200" />
+											</li>
+										)}
+										<motion.li
+										key={`${notification.id}-item`}
+									layout
+									variants={itemVariants}
+									initial="hidden"
+									animate="visible"
+									exit="exit"
+										className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm ${
+											notification.read
+												? "border-slate-200 bg-slate-50"
+												: "border-slate-200 bg-white hover:-translate-y-[1px] hover:shadow-md"
+										}`}
+										style={{ borderLeft: `4px solid ${getAccentColor(notification.type)}` }}
 									>
-										Mark Read
-									</button>
-								)}
-							</li>
-						))}
-					</ul>
+										<div className="min-w-0 flex-1">
+											<div className="mb-1.5 flex flex-wrap items-center gap-2">
+												<span
+													className="inline-flex rounded-full px-2 py-1 text-[0.72rem] font-bold uppercase tracking-wide"
+													style={{ background: `${getAccentColor(notification.type)}20`, color: getAccentColor(notification.type) }}
+												>
+													{getTypeLabel(notification.type)}
+												</span>
+												{index === 0 && (
+													<span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-emerald-700">
+														Latest
+													</span>
+												)}
+											</div>
+											<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-800">
+												{notification.title}
+											</p>
+											<p className="m-0 mb-2 text-slate-600">
+												{notification.message}
+											</p>
+											<p className="m-0 text-[0.85rem] text-slate-500">
+												{notification.type} • {formatTimestamp(notification.createdAt)}
+											</p>
+										</div>
+										{notification.read ? (
+											<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
+												Read
+											</span>
+										) : (
+											<button
+												type="button"
+												className="h-9 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700"
+												onClick={() => handleMarkAsRead(notification.id)}
+											>
+												Mark Read
+											</button>
+										)}
+										</motion.li>
+									</Fragment>
+								))}
+							</AnimatePresence>
+						</motion.ul>
+
+						{hasMoreThanInitial && (
+							<div className="mt-4 flex justify-center">
+								<button
+									type="button"
+									onClick={() => setShowAllNotifications((currentValue) => !currentValue)}
+									className="group inline-flex h-11 items-center gap-2 rounded-full border border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50 px-5 text-[0.86rem] font-bold text-indigo-700 transition-all duration-200 hover:-translate-y-[1px] hover:border-indigo-300 hover:shadow-[0_8px_20px_rgba(79,70,229,0.16)]"
+								>
+									{showAllNotifications ? (
+										<>
+											<span>Show less</span>
+											<span className="rounded-full bg-white/80 px-2 py-0.5 text-[0.72rem] font-extrabold text-indigo-700">
+												Back to {INITIAL_VISIBLE_NOTIFICATIONS}
+											</span>
+										</>
+									) : (
+										<>
+											<span>See more notifications</span>
+											<span className="rounded-full bg-white/90 px-2 py-0.5 text-[0.72rem] font-extrabold text-indigo-700">
+												+{hiddenNotificationsCount}
+											</span>
+										</>
+									)}
+								</button>
+							</div>
+						)}
+					</>
 				)}
-			</article>
-		</section>
+			</motion.article>
+		</motion.section>
 	);
 }
 

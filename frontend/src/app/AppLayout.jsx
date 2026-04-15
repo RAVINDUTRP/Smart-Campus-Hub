@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const baseNavItems = [
@@ -9,18 +10,40 @@ const baseNavItems = [
 	{ label: "Notifications", to: "/notifications" }
 ];
 
+const roleLabelMap = {
+	USER: "Student / User",
+	TECHNICIAN: "Technician",
+	ADMIN: "Administrator"
+};
+
 function AppLayout() {
 	const { profile, oauth2Enabled, logoutUrl, signOutLocal } = useAuth();
 	const navItems = baseNavItems;
+	const [isSigningOut, setIsSigningOut] = useState(false);
+	const mappedRoles = Array.isArray(profile?.roles)
+		? profile.roles
+			.map((role) => String(role || "").trim().toUpperCase())
+			.filter((role) => roleLabelMap[role])
+			.map((role) => roleLabelMap[role])
+		: [];
+	const displayRoles = mappedRoles.length > 0 ? mappedRoles : profile?.email ? [roleLabelMap.USER] : [];
 
-	function handleSignOut() {
-		if (oauth2Enabled) {
-			window.location.assign(logoutUrl);
+	async function handleSignOut() {
+		if (isSigningOut) {
 			return;
 		}
-		signOutLocal().finally(() => {
-			window.location.assign("/login");
-		});
+
+		setIsSigningOut(true);
+		try {
+			await signOutLocal({ skipRefresh: true });
+			if (oauth2Enabled) {
+				window.location.replace(logoutUrl);
+				return;
+			}
+			window.location.replace("/login");
+		} catch (_error) {
+			window.location.replace("/login");
+		}
 	}
 
 	return (
@@ -29,9 +52,10 @@ function AppLayout() {
 				<h1>Smart Campus Hub</h1>
 				{profile && (
 					<div className="profile-card">
-						<p className="profile-name">{profile.displayName}</p>
 						<p className="profile-email">{profile.email}</p>
-						<p className="profile-roles">{(profile.roles || []).join(" • ")}</p>
+						{displayRoles.length > 0 && (
+							<p className="profile-roles">{displayRoles.join(" • ")}</p>
+						)}
 					</div>
 				)}
 				<nav>
@@ -46,8 +70,8 @@ function AppLayout() {
 					))}
 				</nav>
 				<div className="sidebar-auth-actions">
-					<button type="button" className="ghost-btn" onClick={handleSignOut}>
-						Sign out
+					<button type="button" className="ghost-btn" onClick={handleSignOut} disabled={isSigningOut}>
+						{isSigningOut ? "Signing out..." : "Sign out"}
 					</button>
 				</div>
 			</aside>

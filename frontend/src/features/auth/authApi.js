@@ -16,6 +16,12 @@ export function getDefaultLogoutUrl() {
 	return `${getNormalizedAuthBaseUrl()}/logout`;
 }
 
+export function buildOAuthFlowUrl(provider = "google", flow = "login") {
+	const normalizedProvider = String(provider || "google").trim().toLowerCase();
+	const normalizedFlow = String(flow || "login").trim().toLowerCase();
+	return `${getNormalizedAuthBaseUrl()}/api/v1/auth/oauth2/${normalizedProvider}/${normalizedFlow}`;
+}
+
 export function getLocalAuthProfile() {
 	if (typeof window === "undefined") {
 		return null;
@@ -72,4 +78,50 @@ export async function fetchCurrentUser(headers = {}) {
 		}
 	});
 	return response.data;
+}
+
+function resolveApiErrorMessage(error, fallbackMessage) {
+	return (
+		error?.response?.data?.message ||
+		error?.response?.data?.error ||
+		error?.message ||
+		fallbackMessage
+	);
+}
+
+export async function loginLocal({ email, password, role }) {
+	try {
+		const response = await httpClient.post("/auth/login", {
+			email,
+			password,
+			role
+		});
+		return response.data;
+	} catch (error) {
+		throw new Error(resolveApiErrorMessage(error, "Unable to sign in."));
+	}
+}
+
+export async function signupLocal({ email, password, role }) {
+	try {
+		const response = await httpClient.post("/auth/signup", {
+			email,
+			password,
+			role
+		});
+		return response.data;
+	} catch (error) {
+		throw new Error(resolveApiErrorMessage(error, "Unable to create account."));
+	}
+}
+
+export async function fetchLocalRoleByEmail(email) {
+	try {
+		const response = await httpClient.get("/auth/role", {
+			params: { email }
+		});
+		return response.data;
+	} catch (error) {
+		throw new Error(resolveApiErrorMessage(error, "Unable to detect role."));
+	}
 }

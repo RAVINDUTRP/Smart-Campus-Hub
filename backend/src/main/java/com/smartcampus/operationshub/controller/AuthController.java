@@ -1,12 +1,12 @@
 package com.smartcampus.operationshub.controller;
 
-import com.smartcampus.operationshub.dto.UserProfileResponse;
-import com.smartcampus.operationshub.security.OAuth2RoleService;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -15,9 +15,23 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.smartcampus.operationshub.dto.AuthLoginRequest;
+import com.smartcampus.operationshub.dto.AuthRoleResponse;
+import com.smartcampus.operationshub.dto.AuthSessionResponse;
+import com.smartcampus.operationshub.dto.AuthSignupRequest;
+import com.smartcampus.operationshub.dto.UserProfileResponse;
+import com.smartcampus.operationshub.entity.AppUser;
+import com.smartcampus.operationshub.security.OAuth2RoleService;
+import com.smartcampus.operationshub.service.CredentialAuthService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -25,22 +39,70 @@ public class AuthController {
 
     private static final String DEFAULT_EMAIL = "student1@smartcampus.local";
     private static final String GUEST_EMAIL = "guest@smartcampus.local";
+    private static final String OAUTH2_FLOW_SESSION_KEY = "oauth2_flow";
 
     private final boolean oauth2Enabled;
     private final String oauth2RegistrationId;
     private final String backendBaseUrl;
     private final OAuth2RoleService oauth2RoleService;
+    private final CredentialAuthService credentialAuthService;
 
     public AuthController(
             @Value("${app.security.oauth2.enabled:false}") boolean oauth2Enabled,
             @Value("${app.security.oauth2.registration-id:google}") String oauth2RegistrationId,
             @Value("${app.security.oauth2.backend-base-url:http://localhost:8080}") String backendBaseUrl,
-            OAuth2RoleService oauth2RoleService
+            OAuth2RoleService oauth2RoleService,
+            CredentialAuthService credentialAuthService
     ) {
         this.oauth2Enabled = oauth2Enabled;
         this.oauth2RegistrationId = oauth2RegistrationId;
         this.backendBaseUrl = backendBaseUrl;
         this.oauth2RoleService = oauth2RoleService;
+        this.credentialAuthService = credentialAuthService;
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<AuthSessionResponse> signup(@Valid @RequestBody AuthSignupRequest request) {
+        return ResponseEntity.ok(credentialAuthService.signup(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthSessionResponse> login(@Valid @RequestBody AuthLoginRequest request) {
+        return ResponseEntity.ok(credentialAuthService.login(request));
+    }
+
+    @GetMapping("/role")
+    public ResponseEntity<AuthRoleResponse> resolveRole(@RequestParam("email") String email) {
+        String normalizedEmail = normalizeEmail(email, "");
+        if (normalizedEmail.isBlank()) {
+            throw new IllegalArgumentException("Email is required.");
+        }
+
+        String role = credentialAuthService.findPrimaryRoleByEmail(normalizedEmail)
+                .orElseThrow(() -> new IllegalArgumentException("No registered user found for this email."));
+
+        return ResponseEntity.ok(new AuthRoleResponse(role));
+    }
+
+    @GetMapping("/oauth2/{provider}/{flow}")
+    public void beginOAuthFlow(
+            @org.springframework.web.bind.annotation.PathVariable("provider") String provider,
+            @org.springframework.web.bind.annotation.PathVariable("flow") String flow,
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response
+    ) throws java.io.IOException {
+        String normalizedProvider = provider == null ? "" : provider.trim().toLowerCase(Locale.ROOT);
+        String normalizedFlow = flow == null ? "" : flow.trim().toLowerCase(Locale.ROOT);
+
+        if (normalizedProvider.isBlank()) {
+            throw new IllegalArgumentException("OAuth2 provider is required.");
+        }
+        if (!"login".equals(normalizedFlow) && !"signup".equals(normalizedFlow)) {
+            throw new IllegalArgumentException("Unsupported OAuth2 flow. Use login or signup.");
+        }
+
+        request.getSession(true).setAttribute(OAUTH2_FLOW_SESSION_KEY, normalizedFlow);
+        response.sendRedirect("/oauth2/authorization/" + normalizedProvider + "?prompt=select_account");
     }
 
     @GetMapping("/me")
@@ -56,14 +118,16 @@ public class AuthController {
         String email;
         if (isAuthenticated) {
             email = resolveAuthenticatedEmail(authentication);
-        } else if (!oauth2Enabled) {
+        } else if (headerEmail != null && !headerEmail.isBlank()) {
             email = normalizeEmail(headerEmail, GUEST_EMAIL);
         } else {
             email = GUEST_EMAIL;
         }
 
+        Optional<AppUser> localUser = credentialAuthService.findByEmail(email);
+
         Set<String> roleSet = new LinkedHashSet<>();
-        if (isAuthenticated) {
+        if (isAuthenticated && authentication != null && authentication.getAuthorities() != null) {
             for (GrantedAuthority authority : authentication.getAuthorities()) {
                 String authorityName = authority.getAuthority();
                 if (authorityName == null || authorityName.isBlank()) {
@@ -71,11 +135,14 @@ public class AuthController {
                 }
                 if (authorityName.startsWith("ROLE_")) {
                     roleSet.add(authorityName.substring(5));
-                } else {
-                    roleSet.add(authorityName);
                 }
             }
-        } else if (!oauth2Enabled && headerRoles != null && !headerRoles.isBlank()) {
+            if (roleSet.isEmpty() && localUser.isPresent()) {
+                roleSet.addAll(credentialAuthService.resolveRoleHierarchy(localUser.get().getRole()));
+            }
+        } else if (localUser.isPresent()) {
+            roleSet.addAll(credentialAuthService.resolveRoleHierarchy(localUser.get().getRole()));
+        } else if (headerRoles != null && !headerRoles.isBlank()) {
             for (String token : headerRoles.split(",")) {
                 if (!token.isBlank()) {
                     roleSet.add(token.trim().toUpperCase(Locale.ROOT));
@@ -87,11 +154,13 @@ public class AuthController {
             roleSet.add("USER");
         }
 
+        boolean locallyAuthenticated = localUser.isPresent() || (headerEmail != null && !headerEmail.isBlank());
+
         UserProfileResponse profile = new UserProfileResponse();
         profile.setEmail(email);
         profile.setDisplayName(buildDisplayName(email));
         profile.setRoles(new ArrayList<>(roleSet));
-        profile.setAuthenticated(isAuthenticated);
+        profile.setAuthenticated(isAuthenticated || locallyAuthenticated);
         profile.setOauth2Enabled(oauth2Enabled);
         profile.setLoginUrl(buildLoginUrl());
         profile.setLogoutUrl(buildLogoutUrl());
