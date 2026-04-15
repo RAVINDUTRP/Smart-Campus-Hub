@@ -125,6 +125,10 @@ function LoginPage() {
 
 	async function handleQuickLogin(account) {
 		setFeedback("");
+		if (oauth2Enabled) {
+			setFeedback("Demo quick login is disabled while Google sign-in is enabled.");
+			return;
+		}
 		setEmail(account.email);
 		setDetectedRole(account.role);
 		try {
