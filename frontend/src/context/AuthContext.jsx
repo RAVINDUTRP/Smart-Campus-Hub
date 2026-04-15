@@ -43,8 +43,20 @@ export function AuthProvider({ children }) {
 	const oauth2Enabled = Boolean(profile?.oauth2Enabled);
 	const isOauthAuthenticated = Boolean(profile?.authenticated);
 	const isLocalAuthenticated = Boolean(localSession?.email);
-	const roles = isOauthAuthenticated ? profile?.roles || [] : localSession?.roles || [];
-	const isAuthenticated = isOauthAuthenticated || isLocalAuthenticated;
+
+	useEffect(() => {
+		if (oauth2Enabled && localSession?.email) {
+			clearLocalAuthProfile();
+			setLocalSession(null);
+		}
+	}, [oauth2Enabled, localSession]);
+
+	const roles = oauth2Enabled
+		? (isOauthAuthenticated ? profile?.roles || [] : [])
+		: (isOauthAuthenticated ? profile?.roles || [] : localSession?.roles || []);
+	const isAuthenticated = oauth2Enabled
+		? isOauthAuthenticated
+		: (isOauthAuthenticated || isLocalAuthenticated);
 
 	const signInLocal = useCallback(
 		async ({ email, password, role }) => {

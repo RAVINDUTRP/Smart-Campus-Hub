@@ -10,10 +10,14 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,13 +66,25 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthSessionResponse> signup(@Valid @RequestBody AuthSignupRequest request) {
-        return ResponseEntity.ok(credentialAuthService.signup(request));
+    public ResponseEntity<AuthSessionResponse> signup(
+            @Valid @RequestBody AuthSignupRequest request,
+            jakarta.servlet.http.HttpServletRequest servletRequest,
+            jakarta.servlet.http.HttpServletResponse servletResponse
+    ) {
+        AuthSessionResponse session = credentialAuthService.signup(request);
+        establishLocalAuthentication(session, servletRequest, servletResponse);
+        return ResponseEntity.ok(session);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthSessionResponse> login(@Valid @RequestBody AuthLoginRequest request) {
-        return ResponseEntity.ok(credentialAuthService.login(request));
+    public ResponseEntity<AuthSessionResponse> login(
+            @Valid @RequestBody AuthLoginRequest request,
+            jakarta.servlet.http.HttpServletRequest servletRequest,
+            jakarta.servlet.http.HttpServletResponse servletResponse
+    ) {
+        AuthSessionResponse session = credentialAuthService.login(request);
+        establishLocalAuthentication(session, servletRequest, servletResponse);
+        return ResponseEntity.ok(session);
     }
 
     @GetMapping("/role")
@@ -115,10 +131,12 @@ public class AuthController {
                 && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
 
+        boolean localAuthAllowed = !oauth2Enabled;
+
         String email;
         if (isAuthenticated) {
             email = resolveAuthenticatedEmail(authentication);
-        } else if (headerEmail != null && !headerEmail.isBlank()) {
+        } else if (localAuthAllowed && headerEmail != null && !headerEmail.isBlank()) {
             email = normalizeEmail(headerEmail, GUEST_EMAIL);
         } else {
             email = GUEST_EMAIL;
@@ -140,9 +158,9 @@ public class AuthController {
             if (roleSet.isEmpty() && localUser.isPresent()) {
                 roleSet.addAll(credentialAuthService.resolveRoleHierarchy(localUser.get().getRole()));
             }
-        } else if (localUser.isPresent()) {
+        } else if (localAuthAllowed && localUser.isPresent()) {
             roleSet.addAll(credentialAuthService.resolveRoleHierarchy(localUser.get().getRole()));
-        } else if (headerRoles != null && !headerRoles.isBlank()) {
+        } else if (localAuthAllowed && headerRoles != null && !headerRoles.isBlank()) {
             for (String token : headerRoles.split(",")) {
                 if (!token.isBlank()) {
                     roleSet.add(token.trim().toUpperCase(Locale.ROOT));
@@ -150,17 +168,18 @@ public class AuthController {
             }
         }
 
-        if (roleSet.isEmpty() && (isAuthenticated || !GUEST_EMAIL.equals(email))) {
+        if (roleSet.isEmpty() && (isAuthenticated || (localAuthAllowed && !GUEST_EMAIL.equals(email)))) {
             roleSet.add("USER");
         }
 
-        boolean locallyAuthenticated = localUser.isPresent() || (headerEmail != null && !headerEmail.isBlank());
+        boolean locallyAuthenticated = localAuthAllowed && (localUser.isPresent() || (headerEmail != null && !headerEmail.isBlank()));
+        boolean effectiveAuthenticated = oauth2Enabled ? isAuthenticated : (isAuthenticated || locallyAuthenticated);
 
         UserProfileResponse profile = new UserProfileResponse();
         profile.setEmail(email);
         profile.setDisplayName(buildDisplayName(email));
         profile.setRoles(new ArrayList<>(roleSet));
-        profile.setAuthenticated(isAuthenticated || locallyAuthenticated);
+        profile.setAuthenticated(effectiveAuthenticated);
         profile.setOauth2Enabled(oauth2Enabled);
         profile.setLoginUrl(buildLoginUrl());
         profile.setLogoutUrl(buildLogoutUrl());
@@ -212,5 +231,30 @@ public class AuthController {
             transformed.add(word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1));
         }
         return transformed.isEmpty() ? "Campus User" : String.join(" ", transformed);
+    }
+
+    private void establishLocalAuthentication(
+            AuthSessionResponse session,
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response
+    ) {
+        if (session == null || session.getEmail() == null || session.getEmail().isBlank()) {
+            return;
+        }
+
+        List<SimpleGrantedAuthority> authorities = session.getRoles() == null
+                ? List.of()
+                : session.getRoles().stream()
+                .filter(role -> role != null && !role.isBlank())
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.trim().toUpperCase(Locale.ROOT)))
+                .toList();
+
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(session.getEmail(), null, authorities);
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        new HttpSessionSecurityContextRepository().saveContext(context, request, response);
     }
 }
