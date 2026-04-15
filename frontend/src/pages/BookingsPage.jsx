@@ -8,6 +8,7 @@ import {
 	fetchMyBookings,
 	rejectBooking
 } from "../features/bookings/bookingApi";
+import { fetchResources } from "../features/catalogue/resourceApi";
 
 const bookingStatuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"];
 
@@ -51,10 +52,12 @@ function BookingsPage() {
 	const [adminFilters, setAdminFilters] = useState(initialAdminFilters);
 	const [myBookings, setMyBookings] = useState([]);
 	const [adminBookings, setAdminBookings] = useState([]);
+	const [availableResources, setAvailableResources] = useState([]);
 	const [feedback, setFeedback] = useState({ type: "", text: "" });
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isLoadingMy, setIsLoadingMy] = useState(false);
 	const [isLoadingAdmin, setIsLoadingAdmin] = useState(false);
+	const [isLoadingResources, setIsLoadingResources] = useState(false);
 
 	const canSubmit = useMemo(
 		() =>
@@ -66,12 +69,21 @@ function BookingsPage() {
 		[bookingForm, profile]
 	);
 
+	const selectedResource = useMemo(
+		() => availableResources.find((resource) => String(resource.id) === String(bookingForm.resourceId)) || null,
+		[availableResources, bookingForm.resourceId]
+	);
+
 	useEffect(() => {
 		if (!profile?.email) {
 			return;
 		}
 		setBookingForm((prev) => ({ ...prev, requesterEmail: profile.email }));
 	}, [profile]);
+
+	useEffect(() => {
+		loadAvailableResources();
+	}, []);
 
 	function onBookingFormChange(event) {
 		const { name, value } = event.target;
@@ -81,6 +93,18 @@ function BookingsPage() {
 	function onAdminFilterChange(event) {
 		const { name, value } = event.target;
 		setAdminFilters((prev) => ({ ...prev, [name]: value }));
+	}
+
+	async function loadAvailableResources() {
+		try {
+			setIsLoadingResources(true);
+			const data = await fetchResources({ status: "ACTIVE" });
+			setAvailableResources(Array.isArray(data) ? data : []);
+		} catch (error) {
+			setFeedback({ type: "error", text: getErrorMessage(error) });
+		} finally {
+			setIsLoadingResources(false);
+		}
 	}
 
 	async function handleCreateBooking(event) {
@@ -206,15 +230,27 @@ function BookingsPage() {
 					<h3>Create Booking Request</h3>
 					<form className="form-grid" onSubmit={handleCreateBooking}>
 						<label>
-							<span>Resource ID</span>
-							<input
+							<span>Resource</span>
+							<select
 								name="resourceId"
 								value={bookingForm.resourceId}
 								onChange={onBookingFormChange}
-								type="number"
-								min="1"
 								required
-							/>
+							>
+								<option value="">
+									{isLoadingResources ? "Loading available resources..." : "Select an available resource"}
+								</option>
+								{availableResources.map((resource) => (
+									<option key={resource.id} value={resource.id}>
+										#{resource.id} - {resource.name} ({resource.location || "No location"})
+									</option>
+								))}
+							</select>
+							<small className="booking-resource-hint">
+								{selectedResource
+									? `Selected: ${selectedResource.name} | Capacity ${selectedResource.capacity || "-"}`
+									: "Choose from active resources. ID is selected automatically."}
+							</small>
 						</label>
 
 						<label>
@@ -269,6 +305,9 @@ function BookingsPage() {
 						<div className="form-actions">
 							<button type="submit" disabled={!canSubmit || isSubmitting}>
 								{isSubmitting ? "Submitting..." : "Submit Booking"}
+							</button>
+							<button type="button" className="ghost-btn" onClick={loadAvailableResources}>
+								Refresh Resources
 							</button>
 							<button type="button" className="ghost-btn" onClick={() => loadMyBookings()}>
 								Refresh My Bookings

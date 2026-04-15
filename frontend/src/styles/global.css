@@ -432,6 +432,469 @@ th {
 	margin-top: 0;
 }
 
+.booking-resource-hint {
+	display: block;
+	margin-top: 5px;
+	font-size: 0.78rem;
+	font-weight: 600;
+	color: #4c6788;
+}
+
+.catalogue-page {
+	display: grid;
+	gap: 16px;
+	animation: catalogueFadeIn 520ms ease-out both;
+}
+
+.catalogue-hero {
+	position: relative;
+	overflow: hidden;
+	display: grid;
+	grid-template-columns: minmax(300px, 1.25fr) minmax(280px, 1fr);
+	gap: 16px;
+	padding: 20px;
+	border-radius: 18px;
+	background:
+		radial-gradient(circle at 12% 18%, rgba(167, 243, 208, 0.22), transparent 48%),
+		radial-gradient(circle at 82% 84%, rgba(125, 211, 252, 0.22), transparent 46%),
+		linear-gradient(132deg, #0f2a47 0%, #163a63 38%, #1e4f7f 100%);
+	box-shadow: 0 14px 30px rgba(13, 33, 56, 0.24);
+	border: 1px solid rgba(185, 221, 255, 0.28);
+	color: #edf6ff;
+	isolation: isolate;
+}
+
+.catalogue-hero::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 48%);
+	pointer-events: none;
+	z-index: -1;
+}
+
+.catalogue-hero-main h2 {
+	margin: 0;
+	font-size: clamp(1.75rem, 3vw, 2.1rem);
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	color: #f7fbff;
+}
+
+.catalogue-hero-main p {
+	margin: 8px 0 0;
+	max-width: 640px;
+	color: rgba(228, 241, 255, 0.9);
+	line-height: 1.55;
+	font-size: 0.95rem;
+}
+
+.catalogue-eyebrow {
+	margin: 0 0 10px;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 5px 10px;
+	border-radius: 999px;
+	font-size: 0.69rem;
+	font-weight: 800;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #d6ebff;
+	background: rgba(16, 53, 91, 0.52);
+	border: 1px solid rgba(157, 199, 240, 0.35);
+}
+
+.catalogue-readonly {
+	margin-top: 12px;
+	display: inline-flex;
+	padding: 7px 12px;
+	font-size: 0.78rem;
+	font-weight: 700;
+	border-radius: 10px;
+	color: #ffecb5;
+	background: rgba(88, 42, 2, 0.34);
+	border: 1px solid rgba(255, 217, 132, 0.42);
+}
+
+.catalogue-metrics {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(120px, 1fr));
+	gap: 10px;
+	align-content: start;
+	padding-top: 2px;
+}
+
+.catalogue-metric-card {
+	padding: 12px;
+	border-radius: 12px;
+	background: rgba(8, 33, 58, 0.48);
+	border: 1px solid rgba(175, 214, 247, 0.28);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+	backdrop-filter: blur(3px);
+	animation: catalogueFloatIn 480ms ease-out both;
+}
+
+.catalogue-metric-card span {
+	display: block;
+	font-size: 0.73rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: rgba(204, 228, 255, 0.85);
+	margin-bottom: 6px;
+}
+
+.catalogue-metric-card strong {
+	font-size: clamp(1.2rem, 2vw, 1.5rem);
+	font-weight: 800;
+	line-height: 1;
+	color: #ffffff;
+	font-variant-numeric: tabular-nums;
+}
+
+.catalogue-page .catalogue-grid {
+	margin-top: 0;
+	margin-bottom: 2px;
+	gap: 14px;
+}
+
+.catalogue-page .panel-card {
+	position: relative;
+	border-radius: 14px;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.98));
+	border: 1px solid #dbe7f6;
+	box-shadow: 0 8px 20px rgba(20, 44, 77, 0.09);
+	transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+	animation: catalogueFloatIn 500ms ease-out both;
+}
+
+.catalogue-page .panel-card::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: linear-gradient(145deg, rgba(22, 89, 168, 0.05), transparent 48%);
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 220ms ease;
+}
+
+.catalogue-page .panel-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 26px rgba(20, 44, 77, 0.13);
+	border-color: #c8dbf0;
+}
+
+.catalogue-page .panel-card:hover::after {
+	opacity: 1;
+}
+
+.catalogue-panel-head {
+	margin-bottom: 12px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e2ecf8;
+	position: relative;
+}
+
+.catalogue-panel-head::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: -1px;
+	width: 68px;
+	height: 3px;
+	border-radius: 999px;
+	background: linear-gradient(90deg, #1d8aaf, #2f6cd8);
+}
+
+.catalogue-panel-head h3 {
+	margin: 0;
+	font-size: 1.23rem;
+	letter-spacing: -0.01em;
+}
+
+.catalogue-panel-head p {
+	margin: 6px 0 0;
+	color: #5b6d86;
+	font-size: 0.88rem;
+	line-height: 1.45;
+}
+
+.catalogue-form-grid,
+.catalogue-filter-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: 12px;
+	row-gap: 11px;
+}
+
+.catalogue-page .field-span-2 {
+	grid-column: 1 / -1;
+}
+
+.catalogue-page .form-grid label,
+.catalogue-page .filter-grid label {
+	font-weight: 600;
+	color: #39506c;
+	font-size: 0.85rem;
+}
+
+.catalogue-page .form-grid label span,
+.catalogue-page .filter-grid label span {
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-size: 0.69rem;
+	font-weight: 800;
+	color: #5f7899;
+}
+
+.catalogue-page .form-grid input,
+.catalogue-page .form-grid select,
+.catalogue-page .filter-grid input,
+.catalogue-page .filter-grid select {
+	background: linear-gradient(180deg, #fafdff 0%, #f5f9ff 100%);
+	border-color: #cfddf0;
+	box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
+	transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.catalogue-page .form-grid input:focus,
+.catalogue-page .form-grid select:focus,
+.catalogue-page .filter-grid input:focus,
+.catalogue-page .filter-grid select:focus {
+	outline: none;
+	background: #ffffff;
+	border-color: #4a8ad4;
+	box-shadow: 0 0 0 3px rgba(74, 138, 212, 0.16), 0 8px 18px rgba(42, 93, 157, 0.12);
+}
+
+.catalogue-page .form-actions button {
+	background: linear-gradient(120deg, #1659a8, #2b76c5);
+	box-shadow: 0 7px 18px rgba(33, 88, 156, 0.22);
+	transition: transform 170ms ease, box-shadow 170ms ease, filter 170ms ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.catalogue-page .form-actions button:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 10px 20px rgba(33, 88, 156, 0.27);
+	filter: saturate(1.05);
+}
+
+.catalogue-page .form-actions button::after {
+	content: "";
+	position: absolute;
+	left: -55%;
+	top: 0;
+	width: 42%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+	transform: skewX(-22deg);
+	transition: left 260ms ease;
+}
+
+.catalogue-page .form-actions button:hover::after {
+	left: 125%;
+}
+
+.catalogue-page .form-actions .ghost-btn {
+	background: #edf4ff;
+	color: #204d84;
+	border-color: #c4d5ec;
+	box-shadow: none;
+}
+
+.catalogue-page .feedback {
+	margin: 2px 0 6px;
+	font-size: 0.9rem;
+	border-radius: 10px;
+	animation: catalogueFeedbackIn 260ms ease-out both;
+}
+
+.catalogue-page .table-header h3 {
+	margin: 0;
+	font-size: 1.22rem;
+	letter-spacing: -0.01em;
+}
+
+.catalogue-page .table-header span {
+	font-size: 0.83rem;
+	font-weight: 700;
+	color: #4c6481;
+	background: #eaf2fe;
+	border: 1px solid #ccdff7;
+	padding: 4px 10px;
+	border-radius: 999px;
+}
+
+.catalogue-page .table-wrap {
+	border-radius: 12px;
+	border: 1px solid #dce9f8;
+	overflow: auto;
+	background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.catalogue-page table {
+	min-width: 860px;
+	font-size: 0.9rem;
+}
+
+.catalogue-page th,
+.catalogue-page td {
+	padding: 12px 12px;
+	border-bottom-color: #e5eef9;
+}
+
+.catalogue-page th {
+	background: linear-gradient(180deg, #f4f8ff 0%, #edf4ff 100%);
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	font-size: 0.74rem;
+	letter-spacing: 0.09em;
+	color: #5b7090;
+}
+
+.catalogue-row {
+	animation: catalogueRowReveal 360ms ease-out both;
+	transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.catalogue-row:hover {
+	background: #f4f9ff;
+	transform: translateX(2px);
+}
+
+.catalogue-page tbody tr:nth-child(even) {
+	background: #fcfeff;
+}
+
+.catalogue-page .actions-cell {
+	gap: 7px;
+}
+
+.catalogue-page .small-btn {
+	border-radius: 7px;
+	font-size: 0.74rem;
+	font-weight: 700;
+	height: 30px;
+	padding: 0 9px;
+	box-shadow: none;
+	background: #1f4d87;
+}
+
+.catalogue-page .small-btn.danger {
+	background: #b3261e;
+}
+
+.catalogue-page .status-chip {
+	font-size: 0.7rem;
+	padding: 3px 9px;
+	border: 1px solid transparent;
+}
+
+.catalogue-page .status-chip.active {
+	background: #dbf8e5;
+	color: #13643a;
+	border-color: #bfecca;
+}
+
+.catalogue-page .status-chip.active::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	display: inline-block;
+	margin-right: 6px;
+	border-radius: 999px;
+	background: #12b76a;
+	box-shadow: 0 0 0 0 rgba(18, 183, 106, 0.36);
+	animation: cataloguePulse 1.8s ease-out infinite;
+}
+
+.catalogue-page .status-chip.inactive {
+	background: #ffe5e5;
+	color: #9e1d1d;
+	border-color: #f7b9b9;
+}
+
+.catalogue-empty-state {
+	margin: 8px 0 2px;
+	padding: 18px 14px;
+	border: 1px dashed #c8d9ef;
+	border-radius: 10px;
+	color: #506684;
+	background: #f8fbff;
+	font-weight: 600;
+	text-align: center;
+}
+
+@keyframes catalogueFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes catalogueFloatIn {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes catalogueFeedbackIn {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes catalogueRowReveal {
+	from {
+		opacity: 0;
+		transform: translateX(-8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes cataloguePulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(18, 183, 106, 0.32);
+	}
+	70% {
+		box-shadow: 0 0 0 8px rgba(18, 183, 106, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(18, 183, 106, 0);
+	}
+}
+
+@media (max-width: 1260px) {
+	.catalogue-hero {
+		grid-template-columns: 1fr;
+	}
+
+	.catalogue-metrics {
+		grid-template-columns: repeat(4, minmax(120px, 1fr));
+	}
+}
+
 @media (max-width: 1100px) {
 	.catalogue-grid {
 		grid-template-columns: 1fr;
@@ -443,5 +906,26 @@ th {
 
 	.notifications-toolbar input[type="email"] {
 		min-width: 0;
+	}
+}
+
+@media (max-width: 760px) {
+	.catalogue-hero {
+		padding: 16px;
+		border-radius: 14px;
+	}
+
+	.catalogue-metrics {
+		grid-template-columns: repeat(2, minmax(110px, 1fr));
+	}
+
+	.catalogue-form-grid,
+	.catalogue-filter-grid,
+	.catalogue-page .time-row {
+		grid-template-columns: 1fr;
+	}
+
+	.catalogue-page .panel-card {
+		padding: 14px;
 	}
 }
