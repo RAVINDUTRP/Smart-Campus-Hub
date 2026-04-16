@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaCheckCircle, FaTrashAlt, FaUndoAlt } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import {
 	deleteNotification,
@@ -128,7 +129,6 @@ function NotificationsPage() {
 	const [unreadOnly, setUnreadOnly] = useState(false);
 	const [typeFilter, setTypeFilter] = useState("ALL");
 	const [unreadCount, setUnreadCount] = useState(0);
-	const [feedback, setFeedback] = useState({ type: "", text: "" });
 	const [isLoading, setIsLoading] = useState(false);
 	const [showAllNotifications, setShowAllNotifications] = useState(false);
 	const [actionInProgress, setActionInProgress] = useState({});
@@ -168,14 +168,13 @@ function NotificationsPage() {
 		const silent = Boolean(options.silent);
 
 		if (!email) {
-			setFeedback({ type: "error", text: "Recipient email is required." });
+			toast.error("Recipient email is required.");
 			return;
 		}
 
 		try {
 			if (!silent) {
 				setIsLoading(true);
-				setFeedback({ type: "", text: "" });
 			}
 			const [list, summary] = await Promise.all([
 				fetchNotifications(email, unreadFilter),
@@ -185,7 +184,7 @@ function NotificationsPage() {
 			setUnreadCount(summary?.unreadCount || 0);
 		} catch (error) {
 			if (!silent) {
-				setFeedback({ type: "error", text: getErrorMessage(error) });
+				toast.error(getErrorMessage(error));
 			}
 		} finally {
 			if (!silent) {
@@ -198,10 +197,10 @@ function NotificationsPage() {
 		setActionInProgress((currentState) => ({ ...currentState, [`read-${notificationId}`]: true }));
 		try {
 			await markNotificationAsRead(notificationId, recipientEmail);
-			setFeedback({ type: "success", text: `Notification ${notificationId} marked as read.` });
+			toast.success(`Notification ${notificationId} marked as read.`);
 			await loadNotifications({ silent: true });
 		} catch (error) {
-			setFeedback({ type: "error", text: getErrorMessage(error) });
+			toast.error(getErrorMessage(error));
 		} finally {
 			setActionInProgress((currentState) => ({ ...currentState, [`read-${notificationId}`]: false }));
 		}
@@ -211,10 +210,10 @@ function NotificationsPage() {
 		setActionInProgress((currentState) => ({ ...currentState, [`unread-${notificationId}`]: true }));
 		try {
 			await markNotificationAsUnread(notificationId, recipientEmail);
-			setFeedback({ type: "success", text: `Notification ${notificationId} marked as unread.` });
+			toast.success(`Notification ${notificationId} marked as unread.`);
 			await loadNotifications({ silent: true });
 		} catch (error) {
-			setFeedback({ type: "error", text: getErrorMessage(error) });
+			toast.error(getErrorMessage(error));
 		} finally {
 			setActionInProgress((currentState) => ({ ...currentState, [`unread-${notificationId}`]: false }));
 		}
@@ -224,10 +223,10 @@ function NotificationsPage() {
 		setActionInProgress((currentState) => ({ ...currentState, [`delete-${notificationId}`]: true }));
 		try {
 			await deleteNotification(notificationId, recipientEmail);
-			setFeedback({ type: "success", text: `Notification ${notificationId} deleted.` });
+			toast.success(`Notification ${notificationId} deleted.`);
 			await loadNotifications({ silent: true });
 		} catch (error) {
-			setFeedback({ type: "error", text: getErrorMessage(error) });
+			toast.error(getErrorMessage(error));
 		} finally {
 			setActionInProgress((currentState) => ({ ...currentState, [`delete-${notificationId}`]: false }));
 		}
@@ -271,6 +270,17 @@ function NotificationsPage() {
 
 	return (
 		<motion.section className="grid gap-4" variants={containerVariants} initial="hidden" animate="visible">
+			<Toaster
+				position="top-right"
+				toastOptions={{
+					duration: 2600,
+					style: {
+						borderRadius: "12px",
+						fontSize: "0.88rem",
+						fontWeight: 600
+					}
+				}}
+			/>
 
 			{/* ── HEADER (redesigned) ───────────────────────────────────────── */}
 			<motion.header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 p-7 shadow-2xl" variants={sectionVariants}>
@@ -443,25 +453,7 @@ function NotificationsPage() {
 						</div>
 					</div>
 
-					{/* Feedback banner */}
-					<AnimatePresence mode="wait">
-						{feedback.text && (
-							<motion.p
-								key={`${feedback.type}-${feedback.text}`}
-								initial={{ opacity: 0, y: 8 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -8 }}
-								transition={{ duration: 0.35, ease: smoothEase }}
-								className={`mt-4 flex items-center gap-2 rounded-2xl border px-4 py-3 text-[0.88rem] font-semibold ${
-									feedback.type === "error"
-										? "border-red-100 bg-red-50 text-red-600"
-										: "border-emerald-100 bg-emerald-50 text-emerald-700"
-								}`}
-							>
-								{feedback.type === "error" ? "⚠️" : "✅"} {feedback.text}
-							</motion.p>
-						)}
-					</AnimatePresence>
+					{/* Feedback now uses toast notifications */}
 				</div>
 
 				{/* Stat cards — separated by hairline grid */}
