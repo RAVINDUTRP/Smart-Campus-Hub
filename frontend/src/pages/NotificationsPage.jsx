@@ -199,7 +199,7 @@ function NotificationsPage() {
 		try {
 			await markNotificationAsRead(notificationId, recipientEmail);
 			setFeedback({ type: "success", text: `Notification ${notificationId} marked as read.` });
-			await loadNotifications();
+			await loadNotifications({ silent: true });
 		} catch (error) {
 			setFeedback({ type: "error", text: getErrorMessage(error) });
 		} finally {
@@ -212,7 +212,7 @@ function NotificationsPage() {
 		try {
 			await markNotificationAsUnread(notificationId, recipientEmail);
 			setFeedback({ type: "success", text: `Notification ${notificationId} marked as unread.` });
-			await loadNotifications();
+			await loadNotifications({ silent: true });
 		} catch (error) {
 			setFeedback({ type: "error", text: getErrorMessage(error) });
 		} finally {
@@ -225,7 +225,7 @@ function NotificationsPage() {
 		try {
 			await deleteNotification(notificationId, recipientEmail);
 			setFeedback({ type: "success", text: `Notification ${notificationId} deleted.` });
-			await loadNotifications();
+			await loadNotifications({ silent: true });
 		} catch (error) {
 			setFeedback({ type: "error", text: getErrorMessage(error) });
 		} finally {
