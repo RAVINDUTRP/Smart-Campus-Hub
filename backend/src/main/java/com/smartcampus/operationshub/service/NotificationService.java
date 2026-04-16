@@ -1,8 +1,9 @@
 package com.smartcampus.operationshub.service;
 
+import java.util.List;
+
 import com.smartcampus.operationshub.dto.NotificationResponse;
 import com.smartcampus.operationshub.entity.NotificationType;
-import java.util.List;
 
 public interface NotificationService {
 
