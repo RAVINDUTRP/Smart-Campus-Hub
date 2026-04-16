@@ -69,6 +69,27 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public NotificationResponse markAsUnread(Long id, String recipientEmail) {
+        Notification notification = notificationRepository.findByIdAndRecipientEmail(id, normalizeEmail(recipientEmail))
+                .orElseThrow(() -> new NotificationNotFoundException("Notification not found for id: " + id));
+
+        if (notification.isRead()) {
+            notification.setRead(false);
+            notification.setReadAt(null);
+        }
+
+        return toResponse(notificationRepository.save(notification));
+    }
+
+    @Override
+    public void deleteNotification(Long id, String recipientEmail) {
+        Notification notification = notificationRepository.findByIdAndRecipientEmail(id, normalizeEmail(recipientEmail))
+                .orElseThrow(() -> new NotificationNotFoundException("Notification not found for id: " + id));
+
+        notificationRepository.delete(notification);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public long getUnreadCount(String recipientEmail) {
         return notificationRepository.countByRecipientEmailAndIsReadFalse(normalizeEmail(recipientEmail));

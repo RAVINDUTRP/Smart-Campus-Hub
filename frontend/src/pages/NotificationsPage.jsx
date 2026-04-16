@@ -1,11 +1,13 @@
 import { Fragment, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaBell, FaCheckCircle, FaInbox } from "react-icons/fa";
+import { FaBell, FaCheckCircle, FaInbox, FaTrashAlt, FaUndoAlt } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import {
+	deleteNotification,
 	fetchNotifications,
 	fetchNotificationSummary,
-	markNotificationAsRead
+	markNotificationAsRead,
+	markNotificationAsUnread
 } from "../features/notifications/notificationApi";
 
 const smoothEase = [0.22, 1, 0.36, 1];
@@ -129,6 +131,7 @@ function NotificationsPage() {
 	const [feedback, setFeedback] = useState({ type: "", text: "" });
 	const [isLoading, setIsLoading] = useState(false);
 	const [showAllNotifications, setShowAllNotifications] = useState(false);
+	const [actionInProgress, setActionInProgress] = useState({});
 
 	useEffect(() => {
 		if (profile?.email) {
@@ -192,12 +195,41 @@ function NotificationsPage() {
 	}
 
 	async function handleMarkAsRead(notificationId) {
+		setActionInProgress((currentState) => ({ ...currentState, [`read-${notificationId}`]: true }));
 		try {
 			await markNotificationAsRead(notificationId, recipientEmail);
 			setFeedback({ type: "success", text: `Notification ${notificationId} marked as read.` });
 			await loadNotifications();
 		} catch (error) {
 			setFeedback({ type: "error", text: getErrorMessage(error) });
+		} finally {
+			setActionInProgress((currentState) => ({ ...currentState, [`read-${notificationId}`]: false }));
+		}
+	}
+
+	async function handleMarkAsUnread(notificationId) {
+		setActionInProgress((currentState) => ({ ...currentState, [`unread-${notificationId}`]: true }));
+		try {
+			await markNotificationAsUnread(notificationId, recipientEmail);
+			setFeedback({ type: "success", text: `Notification ${notificationId} marked as unread.` });
+			await loadNotifications();
+		} catch (error) {
+			setFeedback({ type: "error", text: getErrorMessage(error) });
+		} finally {
+			setActionInProgress((currentState) => ({ ...currentState, [`unread-${notificationId}`]: false }));
+		}
+	}
+
+	async function handleDeleteNotification(notificationId) {
+		setActionInProgress((currentState) => ({ ...currentState, [`delete-${notificationId}`]: true }));
+		try {
+			await deleteNotification(notificationId, recipientEmail);
+			setFeedback({ type: "success", text: `Notification ${notificationId} deleted.` });
+			await loadNotifications();
+		} catch (error) {
+			setFeedback({ type: "error", text: getErrorMessage(error) });
+		} finally {
+			setActionInProgress((currentState) => ({ ...currentState, [`delete-${notificationId}`]: false }));
 		}
 	}
 
@@ -556,16 +588,44 @@ function NotificationsPage() {
 											</p>
 										</div>
 										{notification.read ? (
-											<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
-												Read
-											</span>
+											<div className="flex flex-col items-end gap-2">
+												<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
+													Read
+												</span>
+												<div className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+												<button
+													type="button"
+													onClick={() => handleMarkAsUnread(notification.id)}
+													disabled={Boolean(actionInProgress[`unread-${notification.id}`] || actionInProgress[`delete-${notification.id}`])}
+													className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2.5 text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
+													title="Mark as unread"
+													aria-label="Mark notification as unread"
+												>
+													<FaUndoAlt />
+													<span className="text-[0.75rem] font-semibold">Unread</span>
+												</button>
+												<button
+													type="button"
+													onClick={() => handleDeleteNotification(notification.id)}
+													disabled={Boolean(actionInProgress[`delete-${notification.id}`] || actionInProgress[`unread-${notification.id}`])}
+													className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-2.5 text-red-700 transition hover:border-red-300 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+													title="Delete notification"
+													aria-label="Delete notification"
+												>
+													<FaTrashAlt />
+													<span className="text-[0.75rem] font-semibold">Delete</span>
+												</button>
+												</div>
+											</div>
 										) : (
 											<button
 												type="button"
-												className="h-9 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700"
+												disabled={Boolean(actionInProgress[`read-${notification.id}`])}
+												className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
 												onClick={() => handleMarkAsRead(notification.id)}
 											>
-												Mark Read
+												<FaCheckCircle className="text-[0.9rem]" />
+												Mark as Read
 											</button>
 										)}
 										</motion.li>
