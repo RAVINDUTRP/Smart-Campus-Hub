@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaBell, FaCheckCircle, FaInbox, FaTrashAlt, FaUndoAlt } from "react-icons/fa";
+import { FaCheckCircle, FaTrashAlt, FaUndoAlt } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import {
 	deleteNotification,
@@ -467,43 +467,28 @@ function NotificationsPage() {
 				{/* Stat cards — separated by hairline grid */}
 				<div className="grid grid-cols-3 divide-x divide-slate-300 border-t border-slate-300">
 					<div className="p-5">
-						<div className="rounded-2xl border border-blue-300 bg-blue-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
-							<div className="mb-3 flex items-start justify-between gap-3">
-								<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-blue-600">Unread</p>
-								<span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-blue-700 shadow-sm ring-1 ring-blue-100">
-									<FaBell className="text-[1.2rem]" />
-								</span>
-							</div>
-							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-blue-700">{unreadCount}</p>
+						<div className="rounded-2xl border border-blue-400 bg-blue-100 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 mb-3 text-[0.7rem] font-black uppercase tracking-[0.14em] text-blue-700">Unread</p>
+							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-blue-800">{unreadCount}</p>
 						</div>
 					</div>
 					<div className="p-5">
-						<div className="rounded-2xl border border-slate-300 bg-slate-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
-							<div className="mb-3 flex items-start justify-between gap-3">
-								<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-slate-500">Loaded</p>
-								<span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/75 text-slate-700 shadow-sm ring-1 ring-slate-200">
-									<FaInbox className="text-[1.2rem]" />
-								</span>
-							</div>
-							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-slate-800">{notifications.length}</p>
+						<div className="rounded-2xl border border-slate-400 bg-slate-100 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 mb-3 text-[0.7rem] font-black uppercase tracking-[0.14em] text-slate-700">Loaded</p>
+							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-slate-900">{notifications.length}</p>
 						</div>
 					</div>
 					<div className="p-5">
-						<div className="rounded-2xl border border-emerald-300 bg-emerald-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
-							<div className="mb-3 flex items-start justify-between gap-3">
-								<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-emerald-600">Read (loaded)</p>
-								<span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/75 text-emerald-700 shadow-sm ring-1 ring-emerald-100">
-									<FaCheckCircle className="text-[1.2rem]" />
-								</span>
-							</div>
-							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-emerald-700">{loadedReadCount}</p>
+						<div className="rounded-2xl border border-emerald-400 bg-emerald-100 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 mb-3 text-[0.7rem] font-black uppercase tracking-[0.14em] text-emerald-700">Read (loaded)</p>
+							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-emerald-800">{loadedReadCount}</p>
 						</div>
 					</div>
 				</div>
 			</motion.article>
 
 			{/* ── NOTIFICATIONS LIST (unchanged) ───────────────────────────── */}
-			<motion.article className="rounded-2xl border border-slate-300 bg-white p-5 shadow-sm" variants={sectionVariants}>
+			<motion.article className="rounded-2xl border border-slate-400 bg-white p-5 shadow-sm" variants={sectionVariants}>
 				<div className="mb-3 flex flex-wrap items-center justify-end gap-2">
 					<span className={`inline-flex items-center rounded-full px-3 py-1 text-[0.78rem] font-semibold ${unreadOnly ? "bg-blue-100 text-blue-800" : "bg-slate-200 text-slate-700"}`}>
 						{unreadOnly ? "Unread only" : "All read states"}
@@ -556,10 +541,10 @@ function NotificationsPage() {
 									initial="hidden"
 									animate="visible"
 									exit="exit"
-										className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm ${
+										className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm transition-all duration-200 ${
 											notification.read
-												? "border-slate-300 bg-slate-50"
-												: "border-slate-300 bg-white hover:-translate-y-[1px] hover:shadow-md"
+												? "border-slate-400 bg-slate-100/80"
+												: "border-slate-500 bg-white hover:-translate-y-[1px] hover:border-slate-600 hover:shadow-md"
 										}`}
 										style={{ borderLeft: `4px solid ${getAccentColor(notification.type)}` }}
 									>
@@ -577,10 +562,10 @@ function NotificationsPage() {
 													</span>
 												)}
 											</div>
-											<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-800">
+											<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-900">
 												{notification.title}
 											</p>
-											<p className="m-0 mb-2 text-slate-600">
+											<p className="m-0 mb-2 text-slate-700">
 												{notification.message}
 											</p>
 											<p className="m-0 text-[0.85rem] text-slate-500">
