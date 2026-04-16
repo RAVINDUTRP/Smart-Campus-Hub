@@ -197,7 +197,7 @@ function NotificationsPage() {
 		setActionInProgress((currentState) => ({ ...currentState, [`read-${notificationId}`]: true }));
 		try {
 			await markNotificationAsRead(notificationId, recipientEmail);
-			toast.success(`Notification ${notificationId} marked as read.`);
+			toast.success("Notification marked as read.");
 			await loadNotifications({ silent: true });
 		} catch (error) {
 			toast.error(getErrorMessage(error));
@@ -210,7 +210,7 @@ function NotificationsPage() {
 		setActionInProgress((currentState) => ({ ...currentState, [`unread-${notificationId}`]: true }));
 		try {
 			await markNotificationAsUnread(notificationId, recipientEmail);
-			toast.success(`Notification ${notificationId} marked as unread.`);
+			toast.success("Notification marked as unread.");
 			await loadNotifications({ silent: true });
 		} catch (error) {
 			toast.error(getErrorMessage(error));
@@ -223,7 +223,7 @@ function NotificationsPage() {
 		setActionInProgress((currentState) => ({ ...currentState, [`delete-${notificationId}`]: true }));
 		try {
 			await deleteNotification(notificationId, recipientEmail);
-			toast.success(`Notification ${notificationId} deleted.`);
+			toast.success("Notification deleted.");
 			await loadNotifications({ silent: true });
 		} catch (error) {
 			toast.error(getErrorMessage(error));
