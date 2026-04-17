@@ -471,7 +471,7 @@ function BookingsPage() {
 				</p>
 			)}
 
-			<article className="panel-card booking-table-card overflow-hidden">
+			<article className="panel-card booking-table-card booking-table-card--my overflow-hidden">
 				<div className="booking-table-head">
 					<h3>My Bookings</h3>
 					<span className="table-count-badge">{myBookings.length} item(s)</span>
@@ -531,7 +531,7 @@ function BookingsPage() {
 			</article>
 
 			{isAdmin && (
-				<article className="panel-card booking-table-card overflow-hidden">
+				<article className="panel-card booking-table-card booking-table-card--admin overflow-hidden">
 					<div className="booking-table-head">
 						<h3>Admin Booking Queue</h3>
 						<span className="table-count-badge">{adminBookings.length} item(s)</span>

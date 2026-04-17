@@ -576,6 +576,26 @@ th {
 	background: linear-gradient(90deg, #2c8bcf, #2ab393);
 }
 
+.booking-page .booking-table-card--my {
+	background: linear-gradient(180deg, #fbfeff 0%, #f1f8ff 56%, #edf5ff 100%);
+	border-color: #cfe1f5;
+	box-shadow: 0 12px 22px rgba(22, 71, 120, 0.11);
+}
+
+.booking-page .booking-table-card--my::before {
+	background: linear-gradient(90deg, #2f8bd3, #58a7e7);
+}
+
+.booking-page .booking-table-card--admin {
+	background: linear-gradient(180deg, #fcfeff 0%, #f2f8ff 48%, #eefaf7 100%);
+	border-color: #cee4e8;
+	box-shadow: 0 12px 22px rgba(20, 87, 103, 0.1);
+}
+
+.booking-page .booking-table-card--admin::before {
+	background: linear-gradient(90deg, #30a2c8, #35b889);
+}
+
 .booking-request-card__header {
 	margin-bottom: 12px;
 }
