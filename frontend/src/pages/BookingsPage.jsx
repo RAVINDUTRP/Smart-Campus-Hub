@@ -248,19 +248,21 @@ function BookingsPage() {
 			</header>
 
 			<section className="booking-stats-grid booking-stats-grid--friendly">
-				<article className="booking-stat-card">
+				<article className="booking-stat-card booking-stat-card--resources">
 					<p className="booking-stat-label">Active Resources</p>
 					<p className="booking-stat-value">{bookingSummary.resources}</p>
 				</article>
-				<article className="booking-stat-card">
+				<article className="booking-stat-card booking-stat-card--pending">
 					<p className="booking-stat-label">My Pending</p>
 					<p className="booking-stat-value booking-stat-value--warning">{bookingSummary.myPending}</p>
 				</article>
-				<article className="booking-stat-card">
+				<article className="booking-stat-card booking-stat-card--approved">
 					<p className="booking-stat-label">My Approved</p>
 					<p className="booking-stat-value booking-stat-value--success">{bookingSummary.myApproved}</p>
 				</article>
-				<article className="booking-stat-card">
+				<article
+					className={`booking-stat-card ${isAdmin ? "booking-stat-card--queue" : "booking-stat-card--total"}`}
+				>
 					<p className="booking-stat-label">{isAdmin ? "Queue Pending" : "My Total"}</p>
 					<p className="booking-stat-value booking-stat-value--danger">
 						{isAdmin ? bookingSummary.queuePending : bookingSummary.myTotal}
@@ -377,7 +379,7 @@ function BookingsPage() {
 							<button
 								type="button"
 								onClick={loadAvailableResources}
-								className="booking-request-btn booking-request-btn--ghost booking-request-btn--secondary"
+								className="booking-request-btn booking-request-btn--ghost booking-request-btn--secondary booking-request-btn--resources"
 							>
 								Refresh Resources
 							</button>
@@ -440,13 +442,16 @@ function BookingsPage() {
 								/>
 							</label>
 							<div className="booking-request-actions booking-request-actions--tight">
-								<button type="submit" className="booking-request-btn booking-request-btn--primary">
+								<button
+									type="submit"
+									className="booking-request-btn booking-request-btn--primary booking-request-btn--load-bookings"
+								>
 									Load Bookings
 								</button>
 								<button
 									type="button"
 									onClick={() => loadAdminBookings({})}
-									className="booking-request-btn booking-request-btn--ghost"
+									className="booking-request-btn booking-request-btn--ghost booking-request-btn--load-all"
 								>
 									Load All
 								</button>
@@ -468,7 +473,7 @@ function BookingsPage() {
 				</p>
 			)}
 
-			<article className="panel-card booking-table-card overflow-hidden">
+			<article className="panel-card booking-table-card booking-table-card--my overflow-hidden">
 				<div className="booking-table-head">
 					<h3>My Bookings</h3>
 					<span className="table-count-badge">{myBookings.length} item(s)</span>
@@ -528,7 +533,7 @@ function BookingsPage() {
 			</article>
 
 			{isAdmin && (
-				<article className="panel-card booking-table-card overflow-hidden">
+				<article className="panel-card booking-table-card booking-table-card--admin overflow-hidden">
 					<div className="booking-table-head">
 						<h3>Admin Booking Queue</h3>
 						<span className="table-count-badge">{adminBookings.length} item(s)</span>
