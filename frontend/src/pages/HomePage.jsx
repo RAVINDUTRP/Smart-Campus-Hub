@@ -69,6 +69,7 @@ function HomePage() {
 		<section className={styles.root}>
 			<header className={styles.hero} style={{ backgroundImage: "url('" + dashboardImage + "')" }}>
 				<div className={styles.heroOverlay} />
+				<div className={styles.heroAtmosphere} aria-hidden="true" />
 				<div className={styles.heroContent}>
 					<h2>Operations Dashboard</h2>
 					<p className={styles.heroSubtitle}>A simple view of campus activity.</p>
