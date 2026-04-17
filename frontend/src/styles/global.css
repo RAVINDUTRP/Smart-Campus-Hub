@@ -115,7 +115,11 @@ body {
 	font-weight: 600;
 	border: 1px solid transparent;
 	overflow: hidden;
-	transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+	transition:
+		background-color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+		transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+		border-color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+		box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .nav-link::after {
@@ -136,6 +140,7 @@ body {
 	width: 20px;
 	font-size: 0.86rem;
 	color: #b5caea;
+	transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), color 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .nav-link:hover,
@@ -155,6 +160,7 @@ body {
 .nav-link.active .nav-icon,
 .nav-link:hover .nav-icon {
 	color: #ffffff;
+	transform: translateX(1px);
 }
 
 .sidebar-auth-actions {

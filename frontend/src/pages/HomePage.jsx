@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import {
-	FaBell,
 	FaCalendarAlt,
 	FaCalendarCheck,
 	FaChevronRight,
@@ -73,7 +73,10 @@ const timelineItems = [
 	"11:45 AM: Camera asset marked ACTIVE after maintenance"
 ];
 
+const heroLottiePath = "https://assets2.lottiefiles.com/packages/lf20_kdx6cani.json";
+
 function HomePage() {
+	const heroLottieRef = useRef(null);
 	const now = new Date();
 	const formattedDate = now.toLocaleDateString(undefined, {
 		weekday: "long",
@@ -81,17 +84,69 @@ function HomePage() {
 		day: "numeric"
 	});
 
+	useEffect(() => {
+		let heroLottie;
+		let disposed = false;
+
+		function loadHeroAnimation() {
+			if (disposed || !window.lottie || !heroLottieRef.current) {
+				return;
+			}
+
+			heroLottie = window.lottie.loadAnimation({
+				container: heroLottieRef.current,
+				renderer: "svg",
+				loop: true,
+				autoplay: true,
+				path: heroLottiePath,
+				rendererSettings: {
+					progressiveLoad: true,
+					preserveAspectRatio: "xMidYMid meet"
+				}
+			});
+		}
+
+		if (window.lottie) {
+			loadHeroAnimation();
+		} else {
+			const existingScript = document.querySelector('script[data-lottie-cdn="true"]');
+			if (existingScript) {
+				existingScript.addEventListener("load", loadHeroAnimation, { once: true });
+			} else {
+				const script = document.createElement("script");
+				script.src = "https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js";
+				script.async = true;
+				script.setAttribute("data-lottie-cdn", "true");
+				script.addEventListener("load", loadHeroAnimation, { once: true });
+				document.body.appendChild(script);
+			}
+		}
+
+		return () => {
+			disposed = true;
+			if (heroLottie) {
+				heroLottie.destroy();
+			}
+		};
+	}, []);
+
 	return (
 		<section className={styles.root}>
 			<header className={styles.hero + " " + styles.sectionCard} style={{ backgroundImage: "url('" + dashboardImage + "')" }}>
 				<div className={styles.heroOverlay} />
-				<div className={styles.heroContent}>
-					<p className={styles.kicker}>Smart Campus Operations</p>
-					<h2>Operations Dashboard</h2>
-					<p className={styles.heroSubtitle}>Everything you need in one clean view.</p>
-					<div className={styles.heroMeta}>
-						<span className={styles.heroChip}>{formattedDate}</span>
-						<span className={styles.heroChip}>Live Overview</span>
+				<div className={styles.heroLayout}>
+					<div className={styles.heroContent}>
+						<p className={styles.kicker}>Smart Campus Operations</p>
+						<h2>Operations Dashboard</h2>
+						<p className={styles.heroSubtitle}>Everything you need in one clean view.</p>
+						<div className={styles.heroMeta}>
+							<span className={styles.heroChip}>{formattedDate}</span>
+							<span className={styles.heroChip}>Live Overview</span>
+						</div>
+					</div>
+					<div className={styles.heroVisual} aria-hidden="true">
+						<div className={styles.heroVisualAura} />
+						<div className={styles.heroLottie} ref={heroLottieRef} />
 					</div>
 				</div>
 			</header>
@@ -181,13 +236,11 @@ function HomePage() {
 				<section className={styles.spotlight + " " + styles.sectionCard}>
 					<img src={dashboardImage} alt="Campus operations" />
 					<div className={styles.spotlightOverlay} />
+					<div className={styles.spotlightAmbient} aria-hidden="true" />
 					<div className={styles.spotlightContent}>
+						<p className={styles.spotlightKicker}>Live Focus</p>
 						<h3>Campus Insight</h3>
-						<p>Clean operations start with clear visibility and faster decisions.</p>
-						<div className={styles.spotlightHint}>
-							<FaBell />
-							<span>Notifications active and synchronized</span>
-						</div>
+						<p>Live campus pulse at a glance.</p>
 					</div>
 				</section>
 			</div>
