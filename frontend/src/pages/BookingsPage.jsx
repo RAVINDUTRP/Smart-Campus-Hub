@@ -440,13 +440,16 @@ function BookingsPage() {
 								/>
 							</label>
 							<div className="booking-request-actions booking-request-actions--tight">
-								<button type="submit" className="booking-request-btn booking-request-btn--primary">
+								<button
+									type="submit"
+									className="booking-request-btn booking-request-btn--primary booking-request-btn--load-bookings"
+								>
 									Load Bookings
 								</button>
 								<button
 									type="button"
 									onClick={() => loadAdminBookings({})}
-									className="booking-request-btn booking-request-btn--ghost"
+									className="booking-request-btn booking-request-btn--ghost booking-request-btn--load-all"
 								>
 									Load All
 								</button>
