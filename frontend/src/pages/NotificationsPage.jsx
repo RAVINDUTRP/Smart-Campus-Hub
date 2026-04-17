@@ -1,10 +1,14 @@
 import { Fragment, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { FaCheckCircle, FaTrashAlt, FaUndoAlt } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import {
+	deleteNotification,
 	fetchNotifications,
 	fetchNotificationSummary,
-	markNotificationAsRead
+	markNotificationAsRead,
+	markNotificationAsUnread
 } from "../features/notifications/notificationApi";
 
 const smoothEase = [0.22, 1, 0.36, 1];
@@ -125,9 +129,9 @@ function NotificationsPage() {
 	const [unreadOnly, setUnreadOnly] = useState(false);
 	const [typeFilter, setTypeFilter] = useState("ALL");
 	const [unreadCount, setUnreadCount] = useState(0);
-	const [feedback, setFeedback] = useState({ type: "", text: "" });
 	const [isLoading, setIsLoading] = useState(false);
 	const [showAllNotifications, setShowAllNotifications] = useState(false);
+	const [actionInProgress, setActionInProgress] = useState({});
 
 	useEffect(() => {
 		if (profile?.email) {
@@ -164,14 +168,13 @@ function NotificationsPage() {
 		const silent = Boolean(options.silent);
 
 		if (!email) {
-			setFeedback({ type: "error", text: "Recipient email is required." });
+			toast.error("Recipient email is required.");
 			return;
 		}
 
 		try {
 			if (!silent) {
 				setIsLoading(true);
-				setFeedback({ type: "", text: "" });
 			}
 			const [list, summary] = await Promise.all([
 				fetchNotifications(email, unreadFilter),
@@ -181,7 +184,7 @@ function NotificationsPage() {
 			setUnreadCount(summary?.unreadCount || 0);
 		} catch (error) {
 			if (!silent) {
-				setFeedback({ type: "error", text: getErrorMessage(error) });
+				toast.error(getErrorMessage(error));
 			}
 		} finally {
 			if (!silent) {
@@ -191,12 +194,41 @@ function NotificationsPage() {
 	}
 
 	async function handleMarkAsRead(notificationId) {
+		setActionInProgress((currentState) => ({ ...currentState, [`read-${notificationId}`]: true }));
 		try {
 			await markNotificationAsRead(notificationId, recipientEmail);
-			setFeedback({ type: "success", text: `Notification ${notificationId} marked as read.` });
-			await loadNotifications();
+			toast.success("Notification marked as read.");
+			await loadNotifications({ silent: true });
 		} catch (error) {
-			setFeedback({ type: "error", text: getErrorMessage(error) });
+			toast.error(getErrorMessage(error));
+		} finally {
+			setActionInProgress((currentState) => ({ ...currentState, [`read-${notificationId}`]: false }));
+		}
+	}
+
+	async function handleMarkAsUnread(notificationId) {
+		setActionInProgress((currentState) => ({ ...currentState, [`unread-${notificationId}`]: true }));
+		try {
+			await markNotificationAsUnread(notificationId, recipientEmail);
+			toast.success("Notification marked as unread.");
+			await loadNotifications({ silent: true });
+		} catch (error) {
+			toast.error(getErrorMessage(error));
+		} finally {
+			setActionInProgress((currentState) => ({ ...currentState, [`unread-${notificationId}`]: false }));
+		}
+	}
+
+	async function handleDeleteNotification(notificationId) {
+		setActionInProgress((currentState) => ({ ...currentState, [`delete-${notificationId}`]: true }));
+		try {
+			await deleteNotification(notificationId, recipientEmail);
+			toast.success("Notification deleted.");
+			await loadNotifications({ silent: true });
+		} catch (error) {
+			toast.error(getErrorMessage(error));
+		} finally {
+			setActionInProgress((currentState) => ({ ...currentState, [`delete-${notificationId}`]: false }));
 		}
 	}
 
@@ -238,6 +270,17 @@ function NotificationsPage() {
 
 	return (
 		<motion.section className="grid gap-4" variants={containerVariants} initial="hidden" animate="visible">
+			<Toaster
+				position="top-right"
+				toastOptions={{
+					duration: 2600,
+					style: {
+						borderRadius: "12px",
+						fontSize: "0.88rem",
+						fontWeight: 600
+					}
+				}}
+			/>
 
 			{/* ── HEADER (redesigned) ───────────────────────────────────────── */}
 			<motion.header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 p-7 shadow-2xl" variants={sectionVariants}>
@@ -278,7 +321,7 @@ function NotificationsPage() {
 			</motion.header>
 
 			{/* ── CONTROL PANEL (redesigned) ────────────────────────────────── */}
-			<motion.article className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm ring-1 ring-black/[0.04]" variants={sectionVariants}>
+			<motion.article className="overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-sm ring-1 ring-black/[0.04]" variants={sectionVariants}>
 				{/* Top gradient stripe */}
 				<div className="h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
 
@@ -410,52 +453,34 @@ function NotificationsPage() {
 						</div>
 					</div>
 
-					{/* Feedback banner */}
-					<AnimatePresence mode="wait">
-						{feedback.text && (
-							<motion.p
-								key={`${feedback.type}-${feedback.text}`}
-								initial={{ opacity: 0, y: 8 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -8 }}
-								transition={{ duration: 0.35, ease: smoothEase }}
-								className={`mt-4 flex items-center gap-2 rounded-2xl border px-4 py-3 text-[0.88rem] font-semibold ${
-									feedback.type === "error"
-										? "border-red-100 bg-red-50 text-red-600"
-										: "border-emerald-100 bg-emerald-50 text-emerald-700"
-								}`}
-							>
-								{feedback.type === "error" ? "⚠️" : "✅"} {feedback.text}
-							</motion.p>
-						)}
-					</AnimatePresence>
+					{/* Feedback now uses toast notifications */}
 				</div>
 
 				{/* Stat cards — separated by hairline grid */}
-				<div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100">
+				<div className="grid grid-cols-3 divide-x divide-slate-300 border-t border-slate-300">
 					<div className="p-5">
-						<div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
-							<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-blue-600">Unread</p>
-							<p className="m-0 mt-2 text-[2rem] font-black leading-none tabular-nums text-blue-700">{unreadCount}</p>
+						<div className="rounded-2xl border border-blue-400 bg-blue-100 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 mb-3 text-[0.7rem] font-black uppercase tracking-[0.14em] text-blue-700">Unread</p>
+							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-blue-800">{unreadCount}</p>
 						</div>
 					</div>
 					<div className="p-5">
-						<div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
-							<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-slate-500">Loaded</p>
-							<p className="m-0 mt-2 text-[2rem] font-black leading-none tabular-nums text-slate-800">{notifications.length}</p>
+						<div className="rounded-2xl border border-slate-400 bg-slate-100 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 mb-3 text-[0.7rem] font-black uppercase tracking-[0.14em] text-slate-700">Loaded</p>
+							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-slate-900">{notifications.length}</p>
 						</div>
 					</div>
 					<div className="p-5">
-						<div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 transition-transform duration-200 hover:-translate-y-0.5">
-							<p className="m-0 text-[0.7rem] font-black uppercase tracking-[0.14em] text-emerald-600">Read (loaded)</p>
-							<p className="m-0 mt-2 text-[2rem] font-black leading-none tabular-nums text-emerald-700">{loadedReadCount}</p>
+						<div className="rounded-2xl border border-emerald-400 bg-emerald-100 p-4 transition-transform duration-200 hover:-translate-y-0.5">
+							<p className="m-0 mb-3 text-[0.7rem] font-black uppercase tracking-[0.14em] text-emerald-700">Read (loaded)</p>
+							<p className="m-0 text-[2rem] font-black leading-none tabular-nums text-emerald-800">{loadedReadCount}</p>
 						</div>
 					</div>
 				</div>
 			</motion.article>
 
 			{/* ── NOTIFICATIONS LIST (unchanged) ───────────────────────────── */}
-			<motion.article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" variants={sectionVariants}>
+			<motion.article className="rounded-2xl border border-slate-400 bg-white p-5 shadow-sm" variants={sectionVariants}>
 				<div className="mb-3 flex flex-wrap items-center justify-end gap-2">
 					<span className={`inline-flex items-center rounded-full px-3 py-1 text-[0.78rem] font-semibold ${unreadOnly ? "bg-blue-100 text-blue-800" : "bg-slate-200 text-slate-700"}`}>
 						{unreadOnly ? "Unread only" : "All read states"}
@@ -473,7 +498,7 @@ function NotificationsPage() {
 				</p>
 
 				{isLoading ? (
-					<motion.div className="rounded-xl border border-slate-200 bg-slate-50 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
+					<motion.div className="rounded-xl border border-slate-300 bg-slate-50 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
 						<p className="m-0 text-slate-600">Loading notifications...</p>
 					</motion.div>
 				) : sortedFilteredNotifications.length === 0 ? (
@@ -508,10 +533,10 @@ function NotificationsPage() {
 									initial="hidden"
 									animate="visible"
 									exit="exit"
-										className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm ${
+										className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-4 shadow-sm transition-all duration-200 ${
 											notification.read
-												? "border-slate-200 bg-slate-50"
-												: "border-slate-200 bg-white hover:-translate-y-[1px] hover:shadow-md"
+												? "border-slate-400 bg-slate-100/80"
+												: "border-slate-500 bg-white hover:-translate-y-[1px] hover:border-slate-600 hover:shadow-md"
 										}`}
 										style={{ borderLeft: `4px solid ${getAccentColor(notification.type)}` }}
 									>
@@ -529,10 +554,10 @@ function NotificationsPage() {
 													</span>
 												)}
 											</div>
-											<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-800">
+											<p className="m-0 mb-1 text-[1.02rem] font-semibold text-slate-900">
 												{notification.title}
 											</p>
-											<p className="m-0 mb-2 text-slate-600">
+											<p className="m-0 mb-2 text-slate-700">
 												{notification.message}
 											</p>
 											<p className="m-0 text-[0.85rem] text-slate-500">
@@ -540,16 +565,44 @@ function NotificationsPage() {
 											</p>
 										</div>
 										{notification.read ? (
-											<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
-												Read
-											</span>
+											<div className="flex flex-col items-end gap-2">
+												<span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
+													Read
+												</span>
+												<div className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+												<button
+													type="button"
+													onClick={() => handleMarkAsUnread(notification.id)}
+													disabled={Boolean(actionInProgress[`unread-${notification.id}`] || actionInProgress[`delete-${notification.id}`])}
+													className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2.5 text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
+													title="Mark as unread"
+													aria-label="Mark notification as unread"
+												>
+													<FaUndoAlt />
+													<span className="text-[0.75rem] font-semibold">Unread</span>
+												</button>
+												<button
+													type="button"
+													onClick={() => handleDeleteNotification(notification.id)}
+													disabled={Boolean(actionInProgress[`delete-${notification.id}`] || actionInProgress[`unread-${notification.id}`])}
+													className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-2.5 text-red-700 transition hover:border-red-300 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+													title="Delete notification"
+													aria-label="Delete notification"
+												>
+													<FaTrashAlt />
+													<span className="text-[0.75rem] font-semibold">Delete</span>
+												</button>
+												</div>
+											</div>
 										) : (
 											<button
 												type="button"
-												className="h-9 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700"
+												disabled={Boolean(actionInProgress[`read-${notification.id}`])}
+												className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-brand-600 px-3 text-[0.85rem] font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
 												onClick={() => handleMarkAsRead(notification.id)}
 											>
-												Mark Read
+												<FaCheckCircle className="text-[0.9rem]" />
+												Mark as Read
 											</button>
 										)}
 										</motion.li>
