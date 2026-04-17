@@ -83,15 +83,15 @@ function HomePage() {
 
 	return (
 		<section className={styles.root}>
-			<header className={styles.hero} style={{ backgroundImage: `url('${dashboardImage}')` }}>
+			<header className={styles.hero + " " + styles.sectionCard} style={{ backgroundImage: "url('" + dashboardImage + "')" }}>
 				<div className={styles.heroOverlay} />
 				<div className={styles.heroContent}>
 					<p className={styles.kicker}>Smart Campus Operations</p>
 					<h2>Operations Dashboard</h2>
-					<p>Everything you need in one clean view.</p>
+					<p className={styles.heroSubtitle}>Everything you need in one clean view.</p>
 					<div className={styles.heroMeta}>
-						<span>{formattedDate}</span>
-						<span>Live Overview</span>
+						<span className={styles.heroChip}>{formattedDate}</span>
+						<span className={styles.heroChip}>Live Overview</span>
 					</div>
 				</div>
 			</header>
@@ -100,7 +100,7 @@ function HomePage() {
 				{metrics.map((card) => {
 					const Icon = card.icon;
 					return (
-						<article key={card.label} className={styles.metricCard} role="listitem">
+						<article key={card.label} className={styles.metricCard + " " + styles.sectionCard} role="listitem">
 							<div className={styles.metricTop}>
 								<p>{card.label}</p>
 								<span className={styles.iconWrap}>
@@ -108,7 +108,7 @@ function HomePage() {
 								</span>
 							</div>
 							<p className={styles.metricValue}>{card.value}</p>
-							<p className={`${styles.metricNote} ${card.tone === "warn" ? styles.warn : styles.good}`}>
+							<p className={styles.metricNote + " " + (card.tone === "warn" ? styles.warn : styles.good)}>
 								{card.note}
 							</p>
 						</article>
@@ -117,7 +117,7 @@ function HomePage() {
 			</div>
 
 			<div className={styles.mainGrid}>
-				<section className={styles.panelWide}>
+				<section className={styles.panelWide + " " + styles.sectionCard}>
 					<div className={styles.panelHead}>
 						<h3>Quick Actions</h3>
 						<p>Pick a module and continue your workflow.</p>
@@ -146,7 +146,7 @@ function HomePage() {
 					</ul>
 				</section>
 
-				<section className={styles.panel}>
+				<section className={styles.panel + " " + styles.sectionCard}>
 					<div className={styles.panelHead}>
 						<h3>System Signals</h3>
 						<p>Quick health check for key flows.</p>
@@ -155,7 +155,7 @@ function HomePage() {
 						{signalItems.map((item) => (
 							<li key={item.title} className={styles.signalItem}>
 								<p className={styles.signalTitle}>{item.title}</p>
-								<span className={`${styles.signalBadge} ${styles[item.status.toLowerCase()]}`}>{item.status}</span>
+								<span className={styles.signalBadge + " " + styles[item.status.toLowerCase()]}>{item.status}</span>
 							</li>
 						))}
 					</ul>
@@ -163,14 +163,14 @@ function HomePage() {
 			</div>
 
 			<div className={styles.bottomGrid}>
-				<section className={styles.panel}>
+				<section className={styles.panel + " " + styles.sectionCard}>
 					<div className={styles.panelHead}>
 						<h3>Today Timeline</h3>
 						<p>Recent events and activity snapshots.</p>
 					</div>
 					<ul className={styles.timelineList}>
 						{timelineItems.map((item) => (
-							<li key={item}>
+							<li key={item} className={styles.timelineRow}>
 								<FaRegClock className={styles.timelineIcon} />
 								<span>{item}</span>
 							</li>
@@ -178,7 +178,7 @@ function HomePage() {
 					</ul>
 				</section>
 
-				<section className={styles.spotlight}>
+				<section className={styles.spotlight + " " + styles.sectionCard}>
 					<img src={dashboardImage} alt="Campus operations" />
 					<div className={styles.spotlightOverlay} />
 					<div className={styles.spotlightContent}>
