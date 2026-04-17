@@ -366,25 +366,25 @@ function BookingsPage() {
 							/>
 						</label>
 
-						<div className="booking-request-actions">
+						<div className="booking-request-actions booking-request-actions--booking">
 							<button
 								type="submit"
 								disabled={!canSubmit || isSubmitting}
-								className="booking-request-btn booking-request-btn--primary"
+								className="booking-request-btn booking-request-btn--primary booking-request-btn--submit"
 							>
 								{isSubmitting ? "Submitting..." : "Submit Booking"}
 							</button>
 							<button
 								type="button"
 								onClick={loadAvailableResources}
-								className="booking-request-btn booking-request-btn--ghost"
+								className="booking-request-btn booking-request-btn--ghost booking-request-btn--secondary"
 							>
 								Refresh Resources
 							</button>
 							<button
 								type="button"
 								onClick={() => loadMyBookings()}
-								className="booking-request-btn booking-request-btn--ghost"
+								className="booking-request-btn booking-request-btn--ghost booking-request-btn--secondary booking-request-btn--my-bookings"
 							>
 								Refresh My Bookings
 							</button>
