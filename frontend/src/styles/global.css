@@ -508,6 +508,36 @@ th {
 	animation: bookingRiseIn 450ms ease-out both;
 }
 
+.booking-stat-card--resources {
+	background: linear-gradient(180deg, #f9fcff 0%, #eef6ff 100%);
+	border-color: #c9def6;
+	box-shadow: 0 8px 16px rgba(38, 95, 152, 0.1);
+}
+
+.booking-stat-card--pending {
+	background: linear-gradient(180deg, #fffaf2 0%, #fff1de 100%);
+	border-color: #f0d4ae;
+	box-shadow: 0 8px 16px rgba(176, 117, 48, 0.12);
+}
+
+.booking-stat-card--approved {
+	background: linear-gradient(180deg, #f3fff9 0%, #e3f8ee 100%);
+	border-color: #bce6d0;
+	box-shadow: 0 8px 16px rgba(31, 129, 91, 0.11);
+}
+
+.booking-stat-card--queue {
+	background: linear-gradient(180deg, #fff5f6 0%, #ffe8ea 100%);
+	border-color: #f2c7cd;
+	box-shadow: 0 8px 16px rgba(169, 58, 70, 0.11);
+}
+
+.booking-stat-card--total {
+	background: linear-gradient(180deg, #f8f7ff 0%, #ecebff 100%);
+	border-color: #d5d3f8;
+	box-shadow: 0 8px 16px rgba(87, 76, 157, 0.1);
+}
+
 .booking-stat-label {
 	margin: 0;
 	font-size: 0.7rem;

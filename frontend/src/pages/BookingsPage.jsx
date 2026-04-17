@@ -248,19 +248,21 @@ function BookingsPage() {
 			</header>
 
 			<section className="booking-stats-grid booking-stats-grid--friendly">
-				<article className="booking-stat-card">
+				<article className="booking-stat-card booking-stat-card--resources">
 					<p className="booking-stat-label">Active Resources</p>
 					<p className="booking-stat-value">{bookingSummary.resources}</p>
 				</article>
-				<article className="booking-stat-card">
+				<article className="booking-stat-card booking-stat-card--pending">
 					<p className="booking-stat-label">My Pending</p>
 					<p className="booking-stat-value booking-stat-value--warning">{bookingSummary.myPending}</p>
 				</article>
-				<article className="booking-stat-card">
+				<article className="booking-stat-card booking-stat-card--approved">
 					<p className="booking-stat-label">My Approved</p>
 					<p className="booking-stat-value booking-stat-value--success">{bookingSummary.myApproved}</p>
 				</article>
-				<article className="booking-stat-card">
+				<article
+					className={`booking-stat-card ${isAdmin ? "booking-stat-card--queue" : "booking-stat-card--total"}`}
+				>
 					<p className="booking-stat-label">{isAdmin ? "Queue Pending" : "My Total"}</p>
 					<p className="booking-stat-value booking-stat-value--danger">
 						{isAdmin ? bookingSummary.queuePending : bookingSummary.myTotal}
