@@ -744,6 +744,13 @@ textarea.booking-request-input {
 	box-shadow: 0 4px 11px rgba(41, 88, 146, 0.1);
 }
 
+.booking-request-btn--my-bookings {
+	background: linear-gradient(120deg, #e8fff5, #d5f6ea);
+	border-color: #96d8bf;
+	color: #16634d;
+	box-shadow: 0 6px 13px rgba(34, 128, 99, 0.15);
+}
+
 .booking-request-btn:hover:not(:disabled) {
 	transform: translateY(-2px);
 }
@@ -757,6 +764,13 @@ textarea.booking-request-input {
 	background: #ffffff;
 	border-color: #9cbce0;
 	box-shadow: 0 8px 16px rgba(58, 98, 145, 0.14);
+}
+
+.booking-request-btn--my-bookings:hover:not(:disabled) {
+	background: linear-gradient(120deg, #dcfaee, #c8f0e1);
+	border-color: #7fcdb0;
+	color: #0f5a44;
+	box-shadow: 0 10px 18px rgba(24, 113, 86, 0.2);
 }
 
 .booking-request-btn:focus-visible {

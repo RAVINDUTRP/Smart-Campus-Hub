@@ -384,7 +384,7 @@ function BookingsPage() {
 							<button
 								type="button"
 								onClick={() => loadMyBookings()}
-								className="booking-request-btn booking-request-btn--ghost booking-request-btn--secondary"
+								className="booking-request-btn booking-request-btn--ghost booking-request-btn--secondary booking-request-btn--my-bookings"
 							>
 								Refresh My Bookings
 							</button>
