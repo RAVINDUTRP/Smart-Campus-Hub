@@ -1120,8 +1120,17 @@ textarea.booking-request-input {
 }
 
 .catalogue-page {
+	--catalogue-navy-900: #102a43;
+	--catalogue-navy-700: #1f4f82;
+	--catalogue-navy-500: #3d6ea6;
+	--catalogue-text-700: #27405e;
+	--catalogue-text-500: #55708f;
+	--catalogue-border: #d6e4f3;
+	--catalogue-surface: #ffffff;
+	--catalogue-surface-soft: #f7faff;
+	--catalogue-shadow: 0 10px 24px rgba(18, 45, 80, 0.08);
 	display: grid;
-	gap: 16px;
+	gap: 18px;
 	animation: catalogueFadeIn 520ms ease-out both;
 }
 
@@ -1130,42 +1139,42 @@ textarea.booking-request-input {
 	overflow: hidden;
 	display: grid;
 	grid-template-columns: minmax(300px, 1.25fr) minmax(280px, 1fr);
-	gap: 16px;
-	padding: 20px;
-	border-radius: 18px;
+	gap: 18px;
+	padding: 22px;
+	border-radius: 16px;
 	background:
-		radial-gradient(circle at 12% 18%, rgba(167, 243, 208, 0.22), transparent 48%),
-		radial-gradient(circle at 82% 84%, rgba(125, 211, 252, 0.22), transparent 46%),
-		linear-gradient(132deg, #0f2a47 0%, #163a63 38%, #1e4f7f 100%);
-	box-shadow: 0 14px 30px rgba(13, 33, 56, 0.24);
-	border: 1px solid rgba(185, 221, 255, 0.28);
-	color: #edf6ff;
+		radial-gradient(circle at 8% 10%, rgba(185, 220, 255, 0.44), transparent 54%),
+		radial-gradient(circle at 94% 88%, rgba(190, 232, 255, 0.36), transparent 58%),
+		linear-gradient(146deg, #f9fbff 0%, #f1f6ff 42%, #ecf4ff 100%);
+	box-shadow: var(--catalogue-shadow);
+	border: 1px solid var(--catalogue-border);
+	color: var(--catalogue-text-700);
 	isolation: isolate;
 }
 
 .catalogue-hero::after {
 	content: "";
 	position: absolute;
-	inset: 0;
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 48%);
+	inset: 0 0 auto;
+	height: 4px;
+	background: linear-gradient(90deg, rgba(31, 79, 130, 0.9), rgba(61, 110, 166, 0.45));
 	pointer-events: none;
-	z-index: -1;
 }
 
 .catalogue-hero-main h2 {
 	margin: 0;
-	font-size: clamp(1.75rem, 3vw, 2.1rem);
+	font-size: clamp(1.72rem, 2.9vw, 2.08rem);
 	line-height: 1.15;
 	letter-spacing: -0.02em;
-	color: #f7fbff;
+	color: var(--catalogue-navy-900);
 }
 
 .catalogue-hero-main p {
 	margin: 8px 0 0;
 	max-width: 640px;
-	color: rgba(228, 241, 255, 0.9);
+	color: var(--catalogue-text-500);
 	line-height: 1.55;
-	font-size: 0.95rem;
+	font-size: 0.94rem;
 }
 
 .catalogue-eyebrow {
@@ -1175,75 +1184,83 @@ textarea.booking-request-input {
 	gap: 8px;
 	padding: 5px 10px;
 	border-radius: 999px;
-	font-size: 0.69rem;
+	font-size: 0.68rem;
 	font-weight: 800;
-	letter-spacing: 0.12em;
+	letter-spacing: 0.11em;
 	text-transform: uppercase;
-	color: #d6ebff;
-	background: rgba(16, 53, 91, 0.52);
-	border: 1px solid rgba(157, 199, 240, 0.35);
+	color: var(--catalogue-navy-700);
+	background: rgba(212, 229, 247, 0.7);
+	border: 1px solid #c8daee;
 }
 
 .catalogue-readonly {
 	margin-top: 12px;
 	display: inline-flex;
-	padding: 7px 12px;
+	padding: 6px 11px;
 	font-size: 0.78rem;
 	font-weight: 700;
-	border-radius: 10px;
-	color: #ffecb5;
-	background: rgba(88, 42, 2, 0.34);
-	border: 1px solid rgba(255, 217, 132, 0.42);
+	border-radius: 9px;
+	color: #785a1f;
+	background: #fff8e6;
+	border: 1px solid #f1deae;
 }
 
 .catalogue-metrics {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(120px, 1fr));
-	gap: 10px;
+	gap: 12px;
 	align-content: start;
 	padding-top: 2px;
 }
 
 .catalogue-metric-card {
-	padding: 12px;
+	padding: 14px;
 	border-radius: 12px;
-	background: rgba(8, 33, 58, 0.48);
-	border: 1px solid rgba(175, 214, 247, 0.28);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-	backdrop-filter: blur(3px);
+	background: rgba(255, 255, 255, 0.86);
+	border: 1px solid var(--catalogue-border);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 	animation: catalogueFloatIn 480ms ease-out both;
 }
 
 .catalogue-metric-card span {
 	display: block;
-	font-size: 0.73rem;
+	font-size: 0.71rem;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: rgba(204, 228, 255, 0.85);
+	letter-spacing: 0.07em;
+	color: var(--catalogue-text-500);
 	margin-bottom: 6px;
 }
 
 .catalogue-metric-card strong {
-	font-size: clamp(1.2rem, 2vw, 1.5rem);
+	font-size: clamp(1.25rem, 2vw, 1.62rem);
 	font-weight: 800;
 	line-height: 1;
-	color: #ffffff;
+	color: var(--catalogue-navy-900);
 	font-variant-numeric: tabular-nums;
 }
 
 .catalogue-page .catalogue-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+	align-items: start;
 	margin-top: 0;
 	margin-bottom: 2px;
-	gap: 14px;
+	gap: 16px;
+}
+
+.catalogue-page .catalogue-grid--student {
+	grid-template-columns: minmax(0, 840px);
+	justify-content: center;
 }
 
 .catalogue-page .panel-card {
 	position: relative;
+	padding: 18px;
 	border-radius: 14px;
-	background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.98));
-	border: 1px solid #dbe7f6;
-	box-shadow: 0 8px 20px rgba(20, 44, 77, 0.09);
+	background: var(--catalogue-surface);
+	border: 1px solid var(--catalogue-border);
+	box-shadow: var(--catalogue-shadow);
 	transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 	animation: catalogueFloatIn 500ms ease-out both;
 }
@@ -1253,16 +1270,16 @@ textarea.booking-request-input {
 	position: absolute;
 	inset: 0;
 	border-radius: inherit;
-	background: linear-gradient(145deg, rgba(22, 89, 168, 0.05), transparent 48%);
+	background: linear-gradient(160deg, rgba(31, 79, 130, 0.03), transparent 55%);
 	pointer-events: none;
 	opacity: 0;
 	transition: opacity 220ms ease;
 }
 
 .catalogue-page .panel-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 12px 26px rgba(20, 44, 77, 0.13);
-	border-color: #c8dbf0;
+	transform: translateY(-1px);
+	box-shadow: 0 12px 28px rgba(20, 48, 84, 0.1);
+	border-color: #cbdeef;
 }
 
 .catalogue-page .panel-card:hover::after {
@@ -1270,9 +1287,9 @@ textarea.booking-request-input {
 }
 
 .catalogue-panel-head {
-	margin-bottom: 12px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid #e2ecf8;
+	margin-bottom: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #e5edf7;
 	position: relative;
 }
 
@@ -1280,31 +1297,42 @@ textarea.booking-request-input {
 	content: "";
 	position: absolute;
 	left: 0;
-	top: -1px;
-	width: 68px;
+	top: -2px;
+	width: 60px;
 	height: 3px;
 	border-radius: 999px;
-	background: linear-gradient(90deg, #1d8aaf, #2f6cd8);
+	background: linear-gradient(90deg, #1f4f82, #4d7eb6);
 }
 
 .catalogue-panel-head h3 {
 	margin: 0;
-	font-size: 1.23rem;
+	font-size: 1.16rem;
 	letter-spacing: -0.01em;
+	color: var(--catalogue-navy-900);
 }
 
 .catalogue-panel-head p {
 	margin: 6px 0 0;
-	color: #5b6d86;
-	font-size: 0.88rem;
+	color: var(--catalogue-text-500);
+	font-size: 0.87rem;
 	line-height: 1.45;
+}
+
+.catalogue-page .catalogue-form-hint {
+	margin: 2px 0 -2px;
+	padding-top: 2px;
+	font-size: 0.75rem;
+	font-weight: 800;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #5d7697;
 }
 
 .catalogue-form-grid,
 .catalogue-filter-grid {
 	grid-template-columns: repeat(2, minmax(0, 1fr));
-	column-gap: 12px;
-	row-gap: 11px;
+	column-gap: 14px;
+	row-gap: 12px;
 }
 
 .catalogue-page .field-span-2 {
@@ -1313,27 +1341,32 @@ textarea.booking-request-input {
 
 .catalogue-page .form-grid label,
 .catalogue-page .filter-grid label {
+	display: grid;
+	gap: 6px;
 	font-weight: 600;
-	color: #39506c;
+	color: var(--catalogue-text-700);
 	font-size: 0.85rem;
 }
 
 .catalogue-page .form-grid label span,
 .catalogue-page .filter-grid label span {
 	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	font-size: 0.69rem;
+	letter-spacing: 0.055em;
+	font-size: 0.68rem;
 	font-weight: 800;
-	color: #5f7899;
+	color: #6280a4;
 }
 
 .catalogue-page .form-grid input,
 .catalogue-page .form-grid select,
 .catalogue-page .filter-grid input,
 .catalogue-page .filter-grid select {
-	background: linear-gradient(180deg, #fafdff 0%, #f5f9ff 100%);
-	border-color: #cfddf0;
-	box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
+	height: 40px;
+	padding: 0 11px;
+	background: var(--catalogue-surface-soft);
+	border: 1px solid #cdddee;
+	border-radius: 9px;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 	transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 
@@ -1343,13 +1376,34 @@ textarea.booking-request-input {
 .catalogue-page .filter-grid select:focus {
 	outline: none;
 	background: #ffffff;
-	border-color: #4a8ad4;
-	box-shadow: 0 0 0 3px rgba(74, 138, 212, 0.16), 0 8px 18px rgba(42, 93, 157, 0.12);
+	border-color: #4a79ab;
+	box-shadow: 0 0 0 3px rgba(74, 121, 171, 0.16);
+}
+
+
+.catalogue-page .time-row {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px;
+}
+
+.catalogue-page .form-actions {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding-top: 4px;
 }
 
 .catalogue-page .form-actions button {
-	background: linear-gradient(120deg, #1659a8, #2b76c5);
-	box-shadow: 0 7px 18px rgba(33, 88, 156, 0.22);
+	height: 40px;
+	padding: 0 14px;
+	border-radius: 9px;
+	font-size: 0.86rem;
+	font-weight: 700;
+	border: 1px solid transparent;
+	background: linear-gradient(125deg, #1f4f82, #2e659f);
+	box-shadow: 0 8px 18px rgba(30, 76, 126, 0.2);
 	transition: transform 170ms ease, box-shadow 170ms ease, filter 170ms ease;
 	position: relative;
 	overflow: hidden;
@@ -1357,8 +1411,8 @@ textarea.booking-request-input {
 
 .catalogue-page .form-actions button:hover {
 	transform: translateY(-1px);
-	box-shadow: 0 10px 20px rgba(33, 88, 156, 0.27);
-	filter: saturate(1.05);
+	box-shadow: 0 10px 21px rgba(29, 76, 124, 0.25);
+	filter: saturate(1.02);
 }
 
 .catalogue-page .form-actions button::after {
@@ -1366,9 +1420,9 @@ textarea.booking-request-input {
 	position: absolute;
 	left: -55%;
 	top: 0;
-	width: 42%;
+	width: 38%;
 	height: 100%;
-	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.23), transparent);
 	transform: skewX(-22deg);
 	transition: left 260ms ease;
 }
@@ -1378,61 +1432,96 @@ textarea.booking-request-input {
 }
 
 .catalogue-page .form-actions .ghost-btn {
-	background: #edf4ff;
-	color: #204d84;
-	border-color: #c4d5ec;
+	background: #f1f6fd;
+	color: #28507f;
+	border-color: #c8d9ec;
+	box-shadow: none;
+}
+
+.catalogue-page .form-actions .ghost-btn:hover {
+	background: #ecf3fc;
 	box-shadow: none;
 }
 
 .catalogue-page .feedback {
-	margin: 2px 0 6px;
+	margin: 0;
+	padding: 10px 12px;
 	font-size: 0.9rem;
 	border-radius: 10px;
+	border: 1px solid transparent;
 	animation: catalogueFeedbackIn 260ms ease-out both;
+}
+
+.catalogue-page .feedback.success {
+	background: #eaf9f0;
+	border-color: #cbeed9;
+	color: #1b6c44;
+}
+
+.catalogue-page .feedback.error {
+	background: #fff2f2;
+	border-color: #f2cdcd;
+	color: #9f2e2e;
+}
+
+.catalogue-page .table-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin-bottom: 12px;
 }
 
 .catalogue-page .table-header h3 {
 	margin: 0;
-	font-size: 1.22rem;
+	font-size: 1.16rem;
 	letter-spacing: -0.01em;
+	color: var(--catalogue-navy-900);
 }
 
 .catalogue-page .table-header span {
-	font-size: 0.83rem;
+	font-size: 0.78rem;
 	font-weight: 700;
-	color: #4c6481;
-	background: #eaf2fe;
-	border: 1px solid #ccdff7;
-	padding: 4px 10px;
+	color: #4f6b8a;
+	background: #edf4fd;
+	border: 1px solid #d0e0f2;
+	padding: 5px 10px;
 	border-radius: 999px;
 }
 
 .catalogue-page .table-wrap {
 	border-radius: 12px;
-	border: 1px solid #dce9f8;
+	border: 1px solid #d7e5f3;
 	overflow: auto;
-	background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+	background: #ffffff;
 }
 
 .catalogue-page table {
-	min-width: 860px;
+	width: 100%;
+	min-width: 900px;
 	font-size: 0.9rem;
+	border-collapse: separate;
+	border-spacing: 0;
 }
 
 .catalogue-page th,
 .catalogue-page td {
-	padding: 12px 12px;
-	border-bottom-color: #e5eef9;
+	padding: 12px 13px;
+	border-bottom: 1px solid #e6eef8;
+	vertical-align: top;
+	color: #2e4664;
 }
 
 .catalogue-page th {
-	background: linear-gradient(180deg, #f4f8ff 0%, #edf4ff 100%);
+	background: #f4f8fe;
 	position: sticky;
 	top: 0;
 	z-index: 1;
-	font-size: 0.74rem;
-	letter-spacing: 0.09em;
-	color: #5b7090;
+	font-size: 0.72rem;
+	letter-spacing: 0.08em;
+	font-weight: 800;
+	text-transform: uppercase;
+	color: #5f7796;
 }
 
 .catalogue-row {
@@ -1441,42 +1530,65 @@ textarea.booking-request-input {
 }
 
 .catalogue-row:hover {
-	background: #f4f9ff;
-	transform: translateX(2px);
+	background: #f8fbff;
+	transform: translateX(1px);
 }
 
 .catalogue-page tbody tr:nth-child(even) {
-	background: #fcfeff;
+	background: #fbfdff;
+}
+
+.catalogue-page .availability-time {
+	font-size: 0.76rem;
+	color: #6d86a5;
 }
 
 .catalogue-page .actions-cell {
-	gap: 7px;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .catalogue-page .small-btn {
-	border-radius: 7px;
-	font-size: 0.74rem;
-	font-weight: 700;
 	height: 30px;
-	padding: 0 9px;
+	padding: 0 10px;
+	border-radius: 8px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	border: 1px solid #c9d9ec;
+	color: #234e80;
+	background: #eef4fd;
 	box-shadow: none;
-	background: #1f4d87;
 }
 
 .catalogue-page .small-btn.danger {
-	background: #b3261e;
+	background: #fff1f1;
+	border-color: #f1cdcd;
+	color: #a43a3a;
+}
+
+.catalogue-page .actions-muted {
+	font-size: 0.78rem;
+	font-weight: 700;
+	color: #7b8fa8;
 }
 
 .catalogue-page .status-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	font-size: 0.7rem;
-	padding: 3px 9px;
+	padding: 4px 9px;
+	border-radius: 999px;
+	font-weight: 700;
 	border: 1px solid transparent;
 }
 
 .catalogue-page .status-chip.active {
-	background: #dbf8e5;
-	color: #13643a;
-	border-color: #bfecca;
+	background: #e5f7ee;
+	color: #1a6f45;
+	border-color: #bfe7d0;
 }
 
 .catalogue-page .status-chip.active::before {
@@ -1484,25 +1596,22 @@ textarea.booking-request-input {
 	width: 6px;
 	height: 6px;
 	display: inline-block;
-	margin-right: 6px;
 	border-radius: 999px;
-	background: #12b76a;
-	box-shadow: 0 0 0 0 rgba(18, 183, 106, 0.36);
-	animation: cataloguePulse 1.8s ease-out infinite;
+	background: #1f9f5f;
 }
 
 .catalogue-page .status-chip.inactive {
-	background: #ffe5e5;
-	color: #9e1d1d;
-	border-color: #f7b9b9;
+	background: #fff1f1;
+	color: #985151;
+	border-color: #f0cfcf;
 }
 
 .catalogue-empty-state {
-	margin: 8px 0 2px;
-	padding: 18px 14px;
-	border: 1px dashed #c8d9ef;
+	margin: 10px 0 2px;
+	padding: 20px 14px;
+	border: 1px dashed #c6d8eb;
 	border-radius: 10px;
-	color: #506684;
+	color: #5a728f;
 	background: #f8fbff;
 	font-weight: 600;
 	text-align: center;
@@ -1575,8 +1684,12 @@ textarea.booking-request-input {
 }
 
 @media (max-width: 1100px) {
-	.catalogue-grid {
+	.catalogue-page .catalogue-grid {
 		grid-template-columns: 1fr;
+	}
+
+	.catalogue-page .catalogue-grid--student {
+		grid-template-columns: minmax(0, 1fr);
 	}
 
 	.notifications-toolbar {
@@ -1605,7 +1718,30 @@ textarea.booking-request-input {
 	}
 
 	.catalogue-page .panel-card {
-		padding: 14px;
+		padding: 15px;
+	}
+
+	.catalogue-page table {
+		min-width: 700px;
+	}
+}
+
+@media (max-width: 560px) {
+	.catalogue-metrics {
+		grid-template-columns: 1fr;
+	}
+
+	.catalogue-page .form-actions button {
+		width: 100%;
+	}
+
+	.catalogue-page .table-header {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.catalogue-page table {
+		min-width: 640px;
 	}
 }
 

@@ -199,7 +199,7 @@ function CataloguePage() {
 		if (!isAdmin) {
 			return;
 		}
-		const confirmed = window.confirm(`Delete resource \"${resource.name}\"?`);
+		const confirmed = window.confirm('Delete resource "' + resource.name + '"?');
 		if (!confirmed) {
 			return;
 		}
@@ -254,7 +254,7 @@ function CataloguePage() {
 				</div>
 			</motion.header>
 
-			<div className="catalogue-grid">
+			<div className={`catalogue-grid${isAdmin ? "" : " catalogue-grid--student"}`}>
 				{isAdmin && (
 					<motion.article className="panel-card catalogue-panel" variants={sectionVariants}>
 						<div className="catalogue-panel-head">
@@ -262,80 +262,82 @@ function CataloguePage() {
 							<p>Create or update campus resources with complete availability details.</p>
 						</div>
 						<form className="form-grid catalogue-form-grid" onSubmit={handleSave}>
-						<label className="field-span-2">
-							<span>Name</span>
-							<input name="name" value={form.name} onChange={handleFormChange} required maxLength={120} />
-						</label>
+							<p className="catalogue-form-hint field-span-2">Basic Details</p>
+							<label className="field-span-2">
+								<span>Name</span>
+								<input name="name" value={form.name} onChange={handleFormChange} required maxLength={120} />
+							</label>
 
-						<label>
-							<span>Type</span>
-							<select name="type" value={form.type} onChange={handleFormChange}>
-								{resourceTypes.map((type) => (
-									<option key={type} value={type}>
-										{type}
-									</option>
-								))}
-							</select>
-						</label>
-
-						<label>
-							<span>Capacity</span>
-							<input
-								name="capacity"
-								value={form.capacity}
-								onChange={handleFormChange}
-								type="number"
-								min="1"
-								required
-							/>
-						</label>
-
-						<label className="field-span-2">
-							<span>Location</span>
-							<input name="location" value={form.location} onChange={handleFormChange} required maxLength={150} />
-						</label>
-
-						<label>
-							<span>Status</span>
-							<select name="status" value={form.status} onChange={handleFormChange}>
-								{resourceStatuses.map((status) => (
-									<option key={status} value={status}>
-										{status}
-									</option>
-								))}
-							</select>
-						</label>
-
-						<label>
-							<span>Availability Days</span>
-							<input
-								name="availabilityDays"
-								value={form.availabilityDays}
-								onChange={handleFormChange}
-								maxLength={100}
-							/>
-						</label>
-
-						<div className="time-row field-span-2">
 							<label>
-								<span>Available From</span>
+								<span>Type</span>
+								<select name="type" value={form.type} onChange={handleFormChange}>
+									{resourceTypes.map((type) => (
+										<option key={type} value={type}>
+											{type}
+										</option>
+									))}
+								</select>
+							</label>
+
+							<label>
+								<span>Capacity</span>
 								<input
-									name="availabilityStart"
-									value={form.availabilityStart}
+									name="capacity"
+									value={form.capacity}
 									onChange={handleFormChange}
-									type="time"
+									type="number"
+									min="1"
+									required
 								/>
 							</label>
+
+							<label className="field-span-2">
+								<span>Location</span>
+								<input name="location" value={form.location} onChange={handleFormChange} required maxLength={150} />
+							</label>
+
+							<p className="catalogue-form-hint field-span-2">Availability Details</p>
 							<label>
-								<span>Available To</span>
+								<span>Status</span>
+								<select name="status" value={form.status} onChange={handleFormChange}>
+									{resourceStatuses.map((status) => (
+										<option key={status} value={status}>
+											{status}
+										</option>
+									))}
+								</select>
+							</label>
+
+							<label>
+								<span>Availability Days</span>
 								<input
-									name="availabilityEnd"
-									value={form.availabilityEnd}
+									name="availabilityDays"
+									value={form.availabilityDays}
 									onChange={handleFormChange}
-									type="time"
+									maxLength={100}
 								/>
 							</label>
-						</div>
+
+							<div className="time-row field-span-2">
+								<label>
+									<span>Available From</span>
+									<input
+										name="availabilityStart"
+										value={form.availabilityStart}
+										onChange={handleFormChange}
+										type="time"
+									/>
+								</label>
+								<label>
+									<span>Available To</span>
+									<input
+										name="availabilityEnd"
+										value={form.availabilityEnd}
+										onChange={handleFormChange}
+										type="time"
+									/>
+								</label>
+							</div>
 
 							<div className="form-actions field-span-2">
 								<button type="submit" disabled={isSubmitting}>
@@ -452,7 +454,7 @@ function CataloguePage() {
 							</thead>
 							<tbody>
 								{resources.map((resource, index) => (
-									<tr key={resource.id} className="catalogue-row" style={{ animationDelay: `${index * 45}ms` }}>
+									<tr key={resource.id} className="catalogue-row" style={{ animationDelay: index * 45 + "ms" }}>
 										<td>{resource.name}</td>
 										<td>{formatEnumLabel(resource.type)}</td>
 										<td>{resource.capacity}</td>
@@ -467,7 +469,7 @@ function CataloguePage() {
 										<td>
 											{resource.availabilityDays || "-"}
 											<br />
-											<small>
+											<small className="availability-time">
 												{toTimeInputValue(resource.availabilityStart) || "--:--"} -{" "}
 												{toTimeInputValue(resource.availabilityEnd) || "--:--"}
 											</small>
@@ -487,7 +489,7 @@ function CataloguePage() {
 													</button>
 												</>
 											) : (
-												<span>-</span>
+												<span className="actions-muted">Read-only</span>
 											)}
 										</td>
 									</tr>
