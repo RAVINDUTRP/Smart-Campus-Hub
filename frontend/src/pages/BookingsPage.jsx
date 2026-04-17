@@ -377,7 +377,7 @@ function BookingsPage() {
 							<button
 								type="button"
 								onClick={loadAvailableResources}
-								className="booking-request-btn booking-request-btn--ghost booking-request-btn--secondary"
+								className="booking-request-btn booking-request-btn--ghost booking-request-btn--secondary booking-request-btn--resources"
 							>
 								Refresh Resources
 							</button>
