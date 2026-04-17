@@ -1342,32 +1342,51 @@ textarea.booking-request-input {
 .catalogue-page .form-grid label,
 .catalogue-page .filter-grid label {
 	display: grid;
-	gap: 6px;
+	gap: 7px;
 	font-weight: 600;
-	color: var(--catalogue-text-700);
-	font-size: 0.85rem;
+	color: #315173;
+	font-size: 0.83rem;
 }
 
 .catalogue-page .form-grid label span,
 .catalogue-page .filter-grid label span {
-	text-transform: uppercase;
-	letter-spacing: 0.055em;
-	font-size: 0.68rem;
-	font-weight: 800;
-	color: #6280a4;
+	text-transform: none;
+	letter-spacing: 0.01em;
+	font-size: 0.76rem;
+	font-weight: 700;
+	color: #5e7b9e;
 }
 
 .catalogue-page .form-grid input,
 .catalogue-page .form-grid select,
 .catalogue-page .filter-grid input,
 .catalogue-page .filter-grid select {
-	height: 40px;
-	padding: 0 11px;
-	background: var(--catalogue-surface-soft);
-	border: 1px solid #cdddee;
-	border-radius: 9px;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-	transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+	height: 42px;
+	padding: 0 12px;
+	font-size: 0.92rem;
+	font-weight: 500;
+	line-height: 1.25;
+	color: #234764;
+	background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+	border: 1px solid #c8d9eb;
+	border-radius: 10px;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(19, 49, 84, 0.04);
+	transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.catalogue-page .form-grid input::placeholder,
+.catalogue-page .filter-grid input::placeholder {
+	color: #8da3bc;
+	opacity: 1;
+	font-weight: 400;
+}
+
+.catalogue-page .form-grid input:hover,
+.catalogue-page .form-grid select:hover,
+.catalogue-page .filter-grid input:hover,
+.catalogue-page .filter-grid select:hover {
+	border-color: #b8cce2;
+	background: #ffffff;
 }
 
 .catalogue-page .form-grid input:focus,
@@ -1376,8 +1395,52 @@ textarea.booking-request-input {
 .catalogue-page .filter-grid select:focus {
 	outline: none;
 	background: #ffffff;
-	border-color: #4a79ab;
-	box-shadow: 0 0 0 3px rgba(74, 121, 171, 0.16);
+	border-color: #4c7eb8;
+	box-shadow: 0 0 0 3px rgba(76, 126, 184, 0.17), 0 8px 16px rgba(30, 72, 120, 0.08);
+}
+
+.catalogue-page .form-grid input:disabled,
+.catalogue-page .form-grid select:disabled,
+.catalogue-page .filter-grid input:disabled,
+.catalogue-page .filter-grid select:disabled {
+	background: #f2f6fb;
+	color: #8da1b9;
+	border-color: #d4e1ef;
+	cursor: not-allowed;
+}
+
+.catalogue-page .form-grid select,
+.catalogue-page .filter-grid select {
+	appearance: none;
+	-webkit-appearance: none;
+	padding-right: 38px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23527598' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 12px center;
+	background-size: 12px 8px;
+	cursor: pointer;
+}
+
+.catalogue-page .form-grid input[type="time"],
+.catalogue-page .filter-grid input[type="time"] {
+	min-width: 0;
+	padding-right: 8px;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.02em;
+}
+
+.catalogue-page .form-grid input[type="time"]::-webkit-calendar-picker-indicator,
+.catalogue-page .filter-grid input[type="time"]::-webkit-calendar-picker-indicator {
+	opacity: 0.76;
+	cursor: pointer;
+	border-radius: 6px;
+	padding: 2px;
+	filter: hue-rotate(172deg) saturate(145%);
+}
+
+.catalogue-page .form-grid input[type="time"]:hover::-webkit-calendar-picker-indicator,
+.catalogue-page .filter-grid input[type="time"]:hover::-webkit-calendar-picker-indicator {
+	opacity: 0.95;
 }
 
 
