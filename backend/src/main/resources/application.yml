@@ -1,6 +1,8 @@
 spring:
   application:
     name: smart-campus-operations-hub
+  config:
+    import: optional:file:.env.shared[.properties],optional:file:backend/.env.shared[.properties],optional:file:.env[.properties],optional:file:backend/.env[.properties]
   profiles:
     default: dev
   jpa:
