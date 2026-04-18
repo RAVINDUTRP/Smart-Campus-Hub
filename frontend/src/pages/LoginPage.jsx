@@ -5,12 +5,6 @@ import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { buildOAuthFlowUrl, fetchLocalRoleByEmail } from "../features/auth/authApi";
 
-const demoAccounts = [
-	{ label: "Student Demo", email: "student1@smartcampus.local", role: "USER" },
-	{ label: "Technician Demo", email: "tech1@smartcampus.local", role: "TECHNICIAN" },
-	{ label: "Admin Demo", email: "admin@smartcampus.local", role: "ADMIN" }
-];
-
 const roleLabels = {
 	USER: "Student / User",
 	TECHNICIAN: "Technician",
@@ -20,7 +14,7 @@ const roleLabels = {
 const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
 
 function LoginPage() {
-	const { oauth2Enabled, isAuthenticated, signInLocal, signInDemo, profile } = useAuth();
+	const { oauth2Enabled, isAuthenticated, signInLocal, profile } = useAuth();
 	const location = useLocation();
 	const [email, setEmail] = useState(profile?.email && profile.email !== "guest@smartcampus.local" ? profile.email : "");
 	const [password, setPassword] = useState("");
@@ -123,21 +117,6 @@ function LoginPage() {
 		}
 	}
 
-	async function handleQuickLogin(account) {
-		setFeedback("");
-		if (oauth2Enabled) {
-			setFeedback("Demo quick login is disabled while Google sign-in is enabled.");
-			return;
-		}
-		setEmail(account.email);
-		setDetectedRole(account.role);
-		try {
-			await signInDemo({ email: account.email, role: account.role });
-		} catch (error) {
-			setFeedback(error?.message || "Demo login failed. Try signing up first.");
-		}
-	}
-
 	return (
 		<section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
 			<div
@@ -225,22 +204,6 @@ function LoginPage() {
 									{feedback}
 								</p>
 							)}
-
-							<div className="grid gap-3 border-t border-slate-200/70 pt-4">
-								<p className="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Quick Demo Access</p>
-								<div className="grid gap-2 sm:grid-cols-3">
-									{demoAccounts.map((account) => (
-										<button
-											key={account.email}
-											type="button"
-											onClick={() => handleQuickLogin(account)}
-											className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[0.92rem] font-semibold text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-										>
-											{account.label}
-										</button>
-									))}
-								</div>
-							</div>
 
 							<form onSubmit={handleLocalSignIn} className="grid gap-4">
 								<label className="grid gap-1.5 text-sm font-semibold text-slate-700">
