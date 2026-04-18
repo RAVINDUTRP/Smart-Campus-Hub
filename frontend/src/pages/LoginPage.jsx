@@ -5,12 +5,6 @@ import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { buildOAuthFlowUrl, fetchLocalRoleByEmail } from "../features/auth/authApi";
 
-const demoAccounts = [
-	{ label: "Student Demo", email: "student1@smartcampus.local", role: "USER" },
-	{ label: "Technician Demo", email: "tech1@smartcampus.local", role: "TECHNICIAN" },
-	{ label: "Admin Demo", email: "admin@smartcampus.local", role: "ADMIN" }
-];
-
 const roleLabels = {
 	USER: "Student / User",
 	TECHNICIAN: "Technician",
@@ -20,7 +14,7 @@ const roleLabels = {
 const coverImage = new URL("../assets/cover.jpg", import.meta.url).href;
 
 function LoginPage() {
-	const { oauth2Enabled, isAuthenticated, signInLocal, signInDemo, profile } = useAuth();
+	const { oauth2Enabled, isAuthenticated, signInLocal, profile } = useAuth();
 	const location = useLocation();
 	const [email, setEmail] = useState(profile?.email && profile.email !== "guest@smartcampus.local" ? profile.email : "");
 	const [password, setPassword] = useState("");
@@ -123,21 +117,6 @@ function LoginPage() {
 		}
 	}
 
-	async function handleQuickLogin(account) {
-		setFeedback("");
-		if (oauth2Enabled) {
-			setFeedback("Demo quick login is disabled while Google sign-in is enabled.");
-			return;
-		}
-		setEmail(account.email);
-		setDetectedRole(account.role);
-		try {
-			await signInDemo({ email: account.email, role: account.role });
-		} catch (error) {
-			setFeedback(error?.message || "Demo login failed. Try signing up first.");
-		}
-	}
-
 	return (
 		<section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
 			<div
@@ -148,90 +127,83 @@ function LoginPage() {
 			<div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl" />
 			<div className="pointer-events-none absolute -bottom-24 -right-16 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl" />
 
-			<div className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-white/30 bg-white/95 shadow-[0_20px_70px_rgba(15,23,42,0.35)] backdrop-blur-sm lg:grid-cols-[1.05fr_1.3fr]">
-				<div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8 text-white sm:p-10">
+			<div className="relative mx-auto grid w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/30 bg-white/95 shadow-[0_24px_80px_rgba(15,23,42,0.38)] backdrop-blur-sm lg:grid-cols-[1.02fr_1.18fr]">
+				<div className="relative flex flex-col bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8 text-white sm:p-10">
 					<div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
 						<span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-900/70 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
 							<span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.85)]" />
 						</span>
 						Smart Campus
 					</div>
-					<h1 className="mt-5 text-3xl font-black leading-tight">Welcome back</h1>
-					<p className="mt-3 text-sm leading-relaxed text-blue-100/90">
+					<h1 className="mt-5 text-3xl font-black leading-tight sm:text-4xl">Welcome back</h1>
+					<p className="mt-3 max-w-md text-sm leading-relaxed text-blue-100/90 sm:text-base">
 						Sign in to manage resources, bookings, tickets, and notifications from one place.
 					</p>
 
-					<div className="mt-8 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
-						<p className="m-0 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-blue-100/80">Access Mode</p>
-						<p className="m-0 mt-1 text-sm text-white">
-							{oauth2Enabled ? "Secure OAuth sign-in is enabled." : "Campus account sign-in is enabled."}
-						</p>
-						<div className="mt-3 flex flex-wrap gap-2">
-							<span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wide text-blue-100">Secure access</span>
-							<span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wide text-blue-100">Role based</span>
-							<span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wide text-blue-100">Operations hub</span>
+					<div className="relative mt-10 flex-1 overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]">
+						<div
+							className="absolute -left-28 -top-28 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl animate-pulse"
+							style={{ animationDelay: "0ms" }}
+						/>
+						<div
+							className="absolute -bottom-40 -right-28 h-96 w-96 rounded-full bg-indigo-400/20 blur-3xl animate-pulse"
+							style={{ animationDelay: "900ms" }}
+						/>
+						<div
+							className="absolute left-1/3 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-emerald-400/10 blur-3xl animate-pulse"
+							style={{ animationDelay: "450ms" }}
+						/>
+						<div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-black/10" />
+
+						<div className="absolute inset-0 flex items-center justify-center">
+							<div className="relative h-44 w-44" aria-hidden="true">
+								<div className="absolute inset-0 rounded-full border border-white/10 bg-white/5" />
+								<div className="absolute inset-5 rounded-full border border-white/10 bg-white/5 blur-sm animate-pulse" />
+
+								<div className="absolute inset-0 rounded-full border border-white/20 border-t-transparent animate-spin" style={{ animationDuration: "10s" }} />
+								<div className="absolute inset-3 rounded-full border border-white/15 border-b-transparent animate-spin" style={{ animationDuration: "14s", animationDirection: "reverse" }} />
+
+								<div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10 shadow-[0_0_40px_rgba(59,130,246,0.22)]" />
+								<div className="absolute left-1/2 top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10 shadow-[0_0_26px_rgba(52,211,153,0.22)] animate-pulse" />
+
+								<div className="absolute inset-0 animate-spin" style={{ animationDuration: "9s" }}>
+									<span className="absolute left-1/2 top-2 h-3 w-3 -translate-x-1/2 rounded-full bg-cyan-300/90 shadow-[0_0_14px_rgba(34,211,238,0.65)]" />
+									<span className="absolute bottom-3 left-6 h-2.5 w-2.5 rounded-full bg-emerald-300/90 shadow-[0_0_14px_rgba(52,211,153,0.6)]" />
+									<span className="absolute right-5 top-12 h-2.5 w-2.5 rounded-full bg-indigo-300/90 shadow-[0_0_14px_rgba(165,180,252,0.6)]" />
+								</div>
+
+								<div className="absolute inset-0 animate-spin" style={{ animationDuration: "16s", animationDirection: "reverse" }}>
+									<span className="absolute left-12 top-10 h-2 w-2 rounded-full bg-white/70 shadow-[0_0_14px_rgba(255,255,255,0.55)]" />
+									<span className="absolute bottom-10 right-12 h-2 w-2 rounded-full bg-white/70 shadow-[0_0_14px_rgba(255,255,255,0.55)]" />
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 
-				<div className="flex items-center bg-white/96 p-7 shadow-[-16px_0_30px_rgba(15,23,42,0.12)] sm:p-8">
+				<div className="flex items-center bg-white/96 p-6 shadow-[-16px_0_30px_rgba(15,23,42,0.12)] sm:p-8 lg:p-10">
 					<div className="mx-auto w-full max-w-lg">
-					<h2 className="m-0 text-2xl font-black tracking-tight text-slate-900">Sign In</h2>
-					<p className="mt-2 text-sm text-slate-500">Sign in to manage campus resources and services.</p>
+						<p className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-slate-600 lg:hidden">
+							<span className="h-2 w-2 rounded-full bg-emerald-500" />
+							Smart Campus
+						</p>
 
-					{false ? (
-						<div className="mt-7 space-y-4">
-							<p className="text-sm font-semibold text-slate-600">Continue with social account</p>
-							<div className="grid grid-cols-3 gap-3">
-								<button
-									type="button"
-									onClick={() => handleOAuthSignIn("google")}
-									className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
-									aria-label="Login with Google"
-									title="Login with Google"
-								>
-									<FcGoogle className="h-5 w-5" />
-									Google
-								</button>
-								<button
-									type="button"
-									onClick={() => handleOAuthSignIn("facebook")}
-									className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-[#1877F2] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
-									aria-label="Login with Facebook"
-									title="Login with Facebook"
-								>
-									<FaFacebookF className="h-5 w-5" />
-									Facebook
-								</button>
-								<button
-									type="button"
-									onClick={() => handleOAuthSignIn("apple")}
-									className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 px-3 text-sm font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_10px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_18px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30"
-									aria-label="Login with Apple"
-									title="Login with Apple"
-								>
-									<FaApple className="h-5 w-5" />
-									Apple
-								</button>
-							</div>
-						</div>
-					) : (
-						<div className="mt-6 space-y-4">
-							<div>
-								<p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-slate-400">Quick Demo Access</p>
-								<div className="grid gap-2 sm:grid-cols-3">
-									{demoAccounts.map((account) => (
-										<button
-											key={account.email}
-											type="button"
-											onClick={() => handleQuickLogin(account)}
-											className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[0.92rem] font-semibold text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
-										>
-											{account.label}
-										</button>
-									))}
+						<div className="mt-5 grid gap-5 rounded-3xl border border-slate-200/70 bg-white/85 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:p-6">
+							<div className="grid gap-2">
+								<div className="flex flex-wrap items-center justify-between gap-3">
+									<h2 className="text-2xl font-black tracking-tight text-slate-900 sm:text-[2rem]">Sign In</h2>
+									<p className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-slate-500">
+										{oauth2Enabled ? "Google sign-in is enabled" : "Email and password mode"}
+									</p>
 								</div>
+								<p className="text-sm text-slate-500 sm:text-[0.95rem]">Sign in to manage campus resources and services.</p>
 							</div>
+
+							{feedback && (
+								<p className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600">
+									{feedback}
+								</p>
+							)}
 
 							<form onSubmit={handleLocalSignIn} className="grid gap-4">
 								<label className="grid gap-1.5 text-sm font-semibold text-slate-700">
@@ -242,7 +214,7 @@ function LoginPage() {
 										value={email}
 										onChange={(event) => setEmail(event.target.value)}
 										required
-										className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_10px_rgba(15,23,42,0.08)] outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12),0_8px_20px_rgba(37,99,235,0.15)]"
+										className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_10px_rgba(15,23,42,0.08)] outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12),0_8px_20px_rgba(37,99,235,0.15)]"
 									/>
 								</label>
 								<label className="grid gap-1.5 text-sm font-semibold text-slate-700">
@@ -254,7 +226,7 @@ function LoginPage() {
 											value={password}
 											onChange={(event) => setPassword(event.target.value)}
 											required
-											className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-10 text-sm text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_10px_rgba(15,23,42,0.08)] outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12),0_8px_20px_rgba(37,99,235,0.15)]"
+											className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 pr-10 text-sm text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_10px_rgba(15,23,42,0.08)] outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.12),0_8px_20px_rgba(37,99,235,0.15)]"
 										/>
 										<button
 											type="button"
@@ -276,7 +248,7 @@ function LoginPage() {
 											type="text"
 											value={isDetectingRole ? "Detecting role..." : detectedRoleLabel}
 											readOnly
-											className="h-10 w-full cursor-not-allowed rounded-xl border-0 bg-slate-200 px-3 pr-10 text-sm font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_4px_10px_rgba(15,23,42,0.08)] outline-none ring-0 focus:ring-0"
+											className="h-11 w-full cursor-not-allowed rounded-xl border-0 bg-slate-200 px-3 pr-10 text-sm font-semibold text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_4px_10px_rgba(15,23,42,0.08)] outline-none ring-0 focus:ring-0"
 										/>
 										<span className="pointer-events-none absolute inset-y-0 right-3 inline-flex items-center text-slate-500">
 											<FaLock className="h-3.5 w-3.5" aria-hidden="true" />
@@ -286,17 +258,10 @@ function LoginPage() {
 
 								<button
 									type="submit"
-									className="h-10 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+									className="h-11 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
 								>
 									Login
 								</button>
-
-								<p className="m-0 text-center text-sm text-slate-500">
-									Don&apos;t have an account?{" "}
-									<Link to="/signup" className="font-semibold text-blue-600 hover:text-blue-700">
-										Create one
-									</Link>
-								</p>
 
 								{oauth2Enabled ? (
 									<div className="pt-1">
@@ -340,14 +305,14 @@ function LoginPage() {
 									</p>
 								)}
 							</form>
-						</div>
-					)}
 
-					{feedback && (
-						<p className="mt-4 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600">
-							{feedback}
-						</p>
-					)}
+							<p className="m-0 border-t border-slate-200/70 pt-4 text-center text-sm text-slate-500">
+								Don&apos;t have an account?{" "}
+								<Link to="/signup" className="font-semibold text-blue-600 hover:text-blue-700">
+									Create one
+								</Link>
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>

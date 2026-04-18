@@ -28,6 +28,11 @@ Testing folders are prepared under `src/test/java/com/smartcampus/operationshub/
 1. `mvn test`
 2. `SPRING_PROFILES_ACTIVE=dev mvn spring-boot:run`
 
+Spring also reads optional env-style property files automatically:
+
+- `backend/.env.shared`
+- `backend/.env`
+
 ## Team-Shared Data Run (Recommended)
 
 Use one shared PostgreSQL database and the same credentials for all members.
@@ -37,7 +42,11 @@ Use one shared PostgreSQL database and the same credentials for all members.
 	- `DB_URL`
 	- `DB_USERNAME`
 	- `DB_PASSWORD`
-3. Run from repository root:
+3. Optional local overrides:
+	- Create `backend/.env` for machine-specific values (for example OAuth2 keys).
+	- `./scripts/run_backend_shared.sh` loads `backend/.env.shared` first, then `backend/.env`.
+	- Shared DB values (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`) always stay from `backend/.env.shared`.
+4. Run from repository root:
 	- `./scripts/run_backend_shared.sh`
 
 Health endpoint:
@@ -47,6 +56,8 @@ Health endpoint:
 ## Module E - Authentication and Authorization
 
 OAuth2 login and RBAC can be enabled with environment variables.
+
+For shared mode, keep DB settings in `backend/.env.shared` and place OAuth-only overrides in `backend/.env` when needed.
 
 Required when OAuth2 is enabled:
 
