@@ -1,0 +1,141 @@
+{
+  "info": {
+    "name": "WS1 Resource Catalogue",
+    "description": "Postman collection for Module A resource management endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Resource",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Lecture Hall A-201\",\n  \"type\": \"LECTURE_HALL\",\n  \"capacity\": 120,\n  \"location\": \"Building A, Floor 2\",\n  \"status\": \"ACTIVE\",\n  \"availabilityDays\": \"Weekdays\",\n  \"availabilityStart\": \"08:00\",\n  \"availabilityEnd\": \"17:00\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/resources",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "resources"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Resources (Filtered)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/resources?type=LECTURE_HALL&location=Building%20A&minCapacity=100",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "resources"
+          ],
+          "query": [
+            {
+              "key": "type",
+              "value": "LECTURE_HALL"
+            },
+            {
+              "key": "location",
+              "value": "Building A"
+            },
+            {
+              "key": "minCapacity",
+              "value": "100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Resource By Id",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/resources/{{resourceId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "resources",
+            "{{resourceId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Resource",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Lecture Hall A-201\",\n  \"type\": \"LECTURE_HALL\",\n  \"capacity\": 130,\n  \"location\": \"Building A, Floor 2\",\n  \"status\": \"ACTIVE\",\n  \"availabilityDays\": \"Weekdays\",\n  \"availabilityStart\": \"08:30\",\n  \"availabilityEnd\": \"17:30\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/resources/{{resourceId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "resources",
+            "{{resourceId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Resource",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/resources/{{resourceId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "resources",
+            "{{resourceId}}"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "resourceId",
+      "value": "1"
+    }
+  ]
+}

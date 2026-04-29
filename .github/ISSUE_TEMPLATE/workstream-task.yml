@@ -1,0 +1,60 @@
+name: Workstream Task
+description: Plan and track a task under WS1, WS2, WS3, or WS4.
+title: "[WSX] "
+labels:
+  - task
+body:
+  - type: dropdown
+    id: workstream
+    attributes:
+      label: Workstream
+      options:
+        - WS1 - Catalogue
+        - WS2 - Bookings
+        - WS3 - Tickets
+        - WS4 - Notifications and Auth
+    validations:
+      required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Assignment Module
+      options:
+        - Module A
+        - Module B
+        - Module C
+        - Module D
+        - Module E
+    validations:
+      required: true
+
+  - type: textarea
+    id: backend_scope
+    attributes:
+      label: Backend scope
+      description: List endpoints, rules, and validations to implement.
+      placeholder: POST /api/v1/resources, GET /api/v1/resources with filters
+
+  - type: textarea
+    id: frontend_scope
+    attributes:
+      label: Frontend scope
+      description: List pages, components, and UX changes.
+      placeholder: Catalogue page list, create modal, filter panel
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Define what must pass before closing this issue.
+      placeholder: Conflict validation returns 409 when overlap exists
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence to attach in PR
+      description: Mention test files, Postman requests, screenshots.
+      placeholder: BookingServiceTest, postman/bookings.json, docs/evidence/ws2-booking.png

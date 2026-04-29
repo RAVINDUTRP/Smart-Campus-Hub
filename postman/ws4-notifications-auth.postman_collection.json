@@ -1,0 +1,115 @@
+{
+  "info": {
+    "name": "WS4 Notifications and Auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Workstream 4 collection for notifications and auth profile endpoints."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1"
+    },
+    {
+      "key": "recipientEmail",
+      "value": "student1@smartcampus.local"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Current User Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-User-Email",
+            "value": "admin@smartcampus.local"
+          },
+          {
+            "key": "X-User-Roles",
+            "value": "ADMIN,USER"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Notifications - List",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/notifications?recipientEmail={{recipientEmail}}&unreadOnly=false",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notifications"
+          ],
+          "query": [
+            {
+              "key": "recipientEmail",
+              "value": "{{recipientEmail}}"
+            },
+            {
+              "key": "unreadOnly",
+              "value": "false"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Notifications - Summary",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/notifications/summary?recipientEmail={{recipientEmail}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notifications",
+            "summary"
+          ],
+          "query": [
+            {
+              "key": "recipientEmail",
+              "value": "{{recipientEmail}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Notifications - Mark Read",
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{baseUrl}}/notifications/1/read?recipientEmail={{recipientEmail}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notifications",
+            "1",
+            "read"
+          ],
+          "query": [
+            {
+              "key": "recipientEmail",
+              "value": "{{recipientEmail}}"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

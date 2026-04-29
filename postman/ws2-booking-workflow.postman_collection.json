@@ -1,0 +1,178 @@
+{
+  "info": {
+    "name": "WS2 Booking Workflow",
+    "description": "Postman collection for Module B booking workflow and conflict checks.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceId\": {{resourceId}},\n  \"requesterEmail\": \"student1@smartcampus.local\",\n  \"startTime\": \"2026-04-20T10:00:00\",\n  \"endTime\": \"2026-04-20T12:00:00\",\n  \"purpose\": \"Workshop\",\n  \"expectedAttendees\": 40\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/bookings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List My Bookings",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/bookings/my?requesterEmail=student1@smartcampus.local",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings",
+            "my"
+          ],
+          "query": [
+            {
+              "key": "requesterEmail",
+              "value": "student1@smartcampus.local"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List All Bookings (Admin Filters)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/bookings?status=PENDING&resourceId={{resourceId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "PENDING"
+            },
+            {
+              "key": "resourceId",
+              "value": "{{resourceId}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Approve Booking",
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/approve",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings",
+            "{{bookingId}}",
+            "approve"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Reject Booking",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Time slot unavailable due to exam\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/reject",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings",
+            "{{bookingId}}",
+            "reject"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Cancel Booking",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"requesterEmail\": \"student1@smartcampus.local\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/cancel",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings",
+            "{{bookingId}}",
+            "cancel"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "resourceId",
+      "value": "1"
+    },
+    {
+      "key": "bookingId",
+      "value": "1"
+    }
+  ]
+}
