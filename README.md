@@ -1,43 +1,86 @@
-# Smart Campus Operations Hub
+# Smart Campus Hub 🎓
 
-Monorepo scaffold for IT3030 coursework.
+![Smart Campus Hub Banner](https://img.shields.io/badge/SLIIT-PAF%20Module-blueviolet?style=for-the-badge)
 
-## Project Structure
+> **SLIIT IT3030 - Programming Applications & Frameworks**  
+> 3rd Year, 2nd Semester — Group Project
 
-```text
-.
-|-- .github/workflows/       # CI workflows
-|-- backend/                 # Spring Boot REST API
-|-- frontend/                # React web application
-|-- docs/                    # Requirements, diagrams, testing evidence
-|-- infra/                   # Docker/K8s and deployment support
-|-- postman/                 # API collections and environment files
-`-- scripts/                 # Utility scripts
+---
+
+## 🚀 Project Overview
+
+**Smart Campus Hub** is a modern, full-stack web application designed to streamline campus operations for students and staff. It integrates resource booking, ticketing, and real-time notifications into a single, user-friendly platform.
+
+- **Frontend:** React, Tailwind CSS, Vite
+- **Backend:** Spring Boot, Spring Security, JPA/Hibernate
+- **Database:** H2 (dev), Flyway migrations
+- **DevOps:** Maven, Docker, Postman
+
+---
+
+## ✨ Features
+
+- 📅 **Resource Booking:** Reserve rooms, labs, and equipment with approval workflows
+- 🎫 **Ticketing System:** Report and track campus issues
+- 🔔 **Notifications:** Real-time updates for bookings and tickets
+- 🔐 **Authentication:** Secure login/signup with OAuth2 support
+- 📊 **Dashboards:** Elegant UI with live stats and filters
+
+---
+
+## 🏗️ Project Structure
+
+```
+Smart-Campus-Hub/
+├── backend/         # Spring Boot API & business logic
+├── frontend/        # React client app
+├── infra/           # Docker, K8s, deployment scripts
+├── docs/            # Architecture, API, evidence
+├── postman/         # API test collections
+└── scripts/         # Utility scripts
 ```
 
-## Assignment Modules Mapped
+---
 
-- Module A: Facilities and Assets Catalogue
-- Module B: Booking Management
-- Module C: Maintenance and Incident Ticketing
-- Module D: Notifications
-- Module E: Authentication and Authorization
+## ⚡ Quick Start
 
-## Solo Work Allocation Strategy (GitHub Visible)
+### 1. Backend
+```bash
+cd backend
+mvn spring-boot:run
+```
 
-This repository uses four workstreams to match the assignment's member split, even when implemented by one developer.
+### 2. Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- WS1: Facilities and Assets Catalogue (Module A)
-- WS2: Booking Workflow and Conflict Rules (Module B)
-- WS3: Tickets, Attachments, Technician Updates (Module C)
-- WS4: Notifications, Roles, OAuth2 (Modules D and E)
+---
 
-To keep contributions clearly visible:
+## 📚 Documentation
+- [API Endpoints](docs/api/endpoint-ownership-matrix.md)
+- [Architecture Diagrams](docs/architecture/)
+- [Evidence & Testing](docs/evidence/)
 
-1. Create feature branches per workstream.
-	- `feat/ws1-...`
-	- `feat/ws2-...`
-	- `feat/ws3-...`
+---
+
+## 👨‍💻 Authors & Contributors
+- **Ravindu TRP** — [github.com/RAVINDUTRP](https://github.com/RAVINDUTRP)
+- **Akindu Shenal**
+- **Aravindi Chirathya**
+- **Lihini Athukorala**
+
+---
+
+## 🏫 About
+This project was developed as part of the SLIIT IT3030 Programming Applications & Frameworks module (3rd Year, 2nd Semester).
+
+---
+
+## 🌟 License
+This project is for academic use at SLIIT. For other use, contact the authors.
 	- `feat/ws4-...`
 2. Use commit prefixes with the same workstream code.
 	- `WS1: add resource create endpoint`
